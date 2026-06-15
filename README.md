@@ -31,7 +31,12 @@ before you rely on it.
 - **211** to be connected to local help for almost anything, 24/7, 150+ languages
 
 ## License
-Public domain (The Unlicense). See `LICENSE`.
+The **code** (HTML, CSS, JavaScript) is open source under the **MIT License** 
+
+The **h3lp name, logo, intro video, and brand look** are **not** open source. They belong to
+Franco Bernal, all rights reserved, and may not be reused or passed off as your own. The
+Fraunces heading font ships under the SIL Open Font License. See the `LICENSE` file for the
+full terms.
 
 > "Reason remains bulletproof, even when written in code."
 > © 2026 Franco Bernal. Proudly built in Ontario, Canada.
