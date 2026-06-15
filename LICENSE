@@ -1,0 +1,56 @@
+MIT License (code only — see "Brand, Content & Trademark" below)
+
+Copyright (c) 2026 Franco Bernal
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+BRAND, CONTENT & TRADEMARK — NOT COVERED BY THE MIT LICENSE ABOVE
+================================================================================
+
+The MIT license above applies ONLY to the source code of this project
+(the HTML, CSS, and JavaScript that makes the site work).
+
+The following are NOT licensed under MIT. They are the exclusive property of
+Franco Bernal and are reserved with all rights. They may NOT be copied, reused,
+modified, redistributed, or used to identify another product or service without
+prior written permission:
+
+  • The "h3lp" name, wordmark, and brand identity.
+  • The h3lp logo and all logo files (assets/h3lp-logo-transparent.png and any
+    variation of it).
+  • The intro video (assets/h3lp-intro.mp4) and any other original audio or
+    video.
+  • The visual design system, colour treatment, and overall look and feel as a
+    distinctive brand presentation.
+
+You are welcome to read and learn from the code, and to build your own,
+clearly different project from it. You may not present your project as "h3lp",
+use the h3lp logo or video, or pass your work off as affiliated with or
+endorsed by h3lp.
+
+Third-party assets:
+  • Headings use the "Fraunces" typeface, © The Fraunces Project Authors,
+    licensed under the SIL Open Font License 1.1. The font is included
+    unmodified in assets/fonts/. See https://github.com/undercasetype/Fraunces.
+
+Resource listings:
+  The helplines and organizations linked from this site are independent third
+  parties. Their names, phone numbers, and trademarks belong to them. h3lp is
+  not affiliated with them and simply links to their official services.
