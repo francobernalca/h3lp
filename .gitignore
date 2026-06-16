@@ -1,0 +1,44 @@
+# ── h3lp — files that should never be committed to the public repo ──
+
+# Secrets & environment (never commit anything like this)
+.env
+.env.*
+*.key
+*.pem
+secrets*
+config.local.*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# Logs & temp
+*.log
+npm-debug.log*
+*.tmp
+*.bak
+
+# Dependency folders (not used by this static site, but safe to ignore)
+node_modules/
+.cache/
