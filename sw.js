@@ -1,7 +1,7 @@
 /* h3lp service worker — cache the hub so it opens even with no signal.
    Stale-while-revalidate: serve from cache instantly, refresh in the background.
    Stores page files on the device only. Nothing about the visitor is recorded. */
-var CACHE = "h3lp-v2";
+var CACHE = "h3lp-v3";
 var CORE = [
   "./",
   "index.html",

@@ -19,7 +19,8 @@ situation, with lines for youth, Indigenous, Black, 2SLGBTQ+, Muslim, Latino/His
 universal ones.
 
 ## Keeping it honest
-Phone numbers and links were verified when this page was built (June 2026). Click through
+Phone numbers and links were verified when this page was built (June 2026, re-verified and
+audited July 2026, including the French edition). Click through
 them now and then and fix anything that has changed. To edit a resource, open `site.js`, find
 the entry in the `R` list (each is one card with a `title`, `body`, and `actions`), and change
 the text, phone (`tel:`), or link (`https:`). Confirm any local detail by calling **211**
@@ -31,12 +32,11 @@ before you rely on it.
 - **211** to be connected to local help for almost anything, 24/7, 150+ languages
 
 ## License
-The **code** (HTML, CSS, JavaScript) is open source under the **MIT License** 
-
-The **h3lp name, logo, intro video, and brand look** are **not** open source. They belong to
-Franco Bernal, all rights reserved, and may not be reused or passed off as your own. The
-Fraunces heading font ships under the SIL Open Font License. See the `LICENSE` file for the
-full terms.
+The source is published so you can read it, learn from it, and verify every number and link
+yourself. It is **not open source**: the work, including the design, code, copywriting, and
+the h3lp name, logo, and intro video, belongs to Franco Bernal, all rights reserved.
+Helpline names and marks belong to their own organizations. The Fraunces heading font ships
+under the SIL Open Font License. See the `LICENSE` file for the full terms.
 
 > "Reason remains bulletproof, even when written in code."
 > © 2026 Franco Bernal. Proudly built in Ontario, Canada.
