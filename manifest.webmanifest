@@ -1,0 +1,13 @@
+{
+  "name": "h3lp · free, verified help across Ontario",
+  "short_name": "h3lp",
+  "description": "One friendly place to find real, free help across Ontario. No sign-up, no tracking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f1e6",
+  "theme_color": "#0c6b80",
+  "icons": [
+    { "src": "assets/h3lp-logo-transparent.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
+  ]
+}
