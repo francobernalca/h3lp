@@ -1,0 +1,37 @@
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), midi=(), serial=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+
+# script-src is strict ('self', no 'unsafe-inline'): h3lp has zero inline
+# <script> blocks, and script-src is where XSS actually lives. Keep it strict.
+#
+# style-src DOES need 'unsafe-inline'. Verified by loading the deployed page:
+# site.js applies styles at runtime (setAttribute('style') / cssText), which
+# CSP blocks under a bare 'self', and the layout breaks. Inline styles are a
+# far smaller risk than inline scripts: they permit CSS injection, not code
+# execution. Do not "fix" this by removing 'unsafe-inline' without re-testing
+# the rendered page for CSP violations in the console.
+
+# The service worker must never be cached hard, or users get stuck on an old
+# build with no way to update.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
