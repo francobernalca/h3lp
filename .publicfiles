@@ -1,0 +1,13 @@
+# Public surface allowlist for h3lp.
+# A file ships because it is named here, never because it sits in the repo.
+# README.md and LICENSE are deliberately absent: build-public.sh replaces them
+# with a stub so a probe gets a harmless answer instead of repository content.
+
+index.html
+_headers
+404.html
+manifest.webmanifest
+site.css
+site.js
+sw.js
+assets
