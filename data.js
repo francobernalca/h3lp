@@ -401,7 +401,7 @@
       hintCity: "{n} services dans cette liste pour {city}. L’aide alimentaire locale passe en premier; les lignes téléphoniques fonctionnent partout en Ontario.",
       saySummary: "Vous ne savez pas quoi dire? Touchez pour des phrases d’ouverture",
       sayReassure: "Vous n’avez pas besoin des mots parfaits. Ces personnes sont formées pour porter la conversation à partir de là.",
-      status: { always: "24/7", open: "Ouvert jusqu’à {t}", opens: "Ouvre à {t}", opensDay: "Ouvre {day} à {t}", confirm: "Appelez pour confirmer les heures", online: "En ligne, en tout temps" },
+      status: { always: "24/7", open: "Ouvert jusqu’à {t}", opens: "Ouvre à {t}", opensDay: "Ouvre {day} à {t}", confirm: "Heures à confirmer", online: "En ligne, en tout temps" },
       days: ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."],
       copyNumber: "Copier le numéro", copied: "Copié", share: "Partager", shared: "Lien copié",
       shareSuffix: "aide gratuite et vérifiée via h3lp",

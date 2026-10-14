@@ -229,13 +229,17 @@
   function idList(ids) { return ids.map(function (id) { return BY_ID[id]; }).filter(function (r) { return r && visible(r); }); }
 
   /* ---------- weather safety (Open-Meteo, the one live source) ---------- */
-  var wxCache = {};
+  var wxCache = {}, wxWait = {};
   function weatherFor(slug, cb) {
     var c = CITY[slug];
-    if (!c || c.lat == null || !window.fetch) return cb(null);
+    if (!c || c.lat == null || !window.fetch || navigator.onLine === false) return cb(null);
     var hour = Math.floor(Date.now() / 3600000);
     var key = slug + ":" + hour;
     if (wxCache[key] !== undefined) return cb(wxCache[key]);
+    if (wxWait[key]) { wxWait[key].push(cb); return; }
+    wxWait[key] = [cb];
+    var done = cb;
+    cb = function (v) { var list = wxWait[key] || [done]; delete wxWait[key]; list.forEach(function (f) { f(v); }); };
     var ctl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
     var url = "https://api.open-meteo.com/v1/forecast?latitude=" + c.lat + "&longitude=" + c.lon +
@@ -753,14 +757,19 @@
       $("pstatus").textContent = S("plan.statusTemp");
     }
   }
+  function lineName(lid) {
+    var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
+    var name = l.title.replace(/^(Call|Appelez le)\s+/, "");
+    var num = ph ? displayNumber(ph.href) : "";
+    return name.indexOf(num) > -1 || !num ? name : name + "  " + num;
+  }
   function planPrintHTML() {
     var d = planData(), steps = S("plan.steps");
     var html = "<h1>" + esc(S("tools.plan.title")) + "</h1>";
     steps.forEach(function (s, i) {
       var txt = d.steps[i] || "";
       if (i === 4 && d.lines.length) txt = d.lines.map(function (lid) {
-        var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
-        return l.title + (ph ? "  " + displayNumber(ph.href) : "");
+        return lineName(lid);
       }).join("\n") + (txt ? "\n" + txt : "");
       html += "<h2>" + (i + 1) + ". " + esc(s.t) + "</h2>" + (txt ? "<p>" + esc(txt) + "</p>" : '<div class="blank"></div>');
     });
@@ -793,8 +802,7 @@
     steps.forEach(function (s, i) {
       var txt = d.steps[i] || "";
       if (i === 4 && d.lines.length) txt = d.lines.map(function (lid) {
-        var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
-        return l.title + (ph ? "  " + displayNumber(ph.href) : "");
+        return lineName(lid);
       }).join("\n") + (txt ? "\n" + txt : "");
       blocks.push({ lines: wrap((i + 1) + ". " + s.t, 34, "700", font, W - 2 * pad), size: 34, weight: "700", family: font, lh: 44, gap: 8 });
       blocks.push({ lines: wrap(txt || " ", 32, "400", font, W - 2 * pad), size: 32, weight: "400", family: font, lh: 46, gap: 26, muted: !txt });

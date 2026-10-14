@@ -5,7 +5,7 @@
 @font-face { font-family: "Fraunces"; src: url("assets/fonts/fraunces-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 
 :root {
-  --bg: #f6f2ea; --surface: #fffdf8; --well: #eee8dc; --ink: #1a211d; --ink-2: #4b5650; --ink-3: #5f6a63;
+  --bg: #f6f2ea; --surface: #fcf9f3; --well: #eee8dc; --ink: #1a211d; --ink-2: #4b5650; --ink-3: #5f6a63;
   --line: rgba(26, 33, 29, .12); --line-2: rgba(26, 33, 29, .26); --field: #7d8680;
   --teal: #0b5e6e; --teal-hover: #084b58; --on-teal: #fff; --teal-ink: #0a5a69; --teal-tint: #e0ecec;
   --ember: #9c3f26; --ember-tint: #fbece4; --ember-line: rgba(156, 63, 38, .3);
@@ -208,12 +208,12 @@ h1 {
   position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px;
   padding: 18px 18px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
 }
-.card-top { display: flex; align-items: flex-start; gap: 10px; }
+.card-top { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
 .card-ic { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--well); color: var(--ink-2); }
 .kicker { flex: 1; margin: 0; padding-top: 7px; font-size: 15px; font-weight: 650; line-height: 1.3; color: var(--ink-2); }
 .status {
   flex: none; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 4px 10px; border-radius: 999px;
-  font-size: 14px; font-weight: 700; line-height: 1.3; background: var(--well); color: var(--ink-2); white-space: nowrap;
+  font-size: 14px; font-weight: 700; line-height: 1.3; background: var(--well); color: var(--ink-2); max-width: 100%; margin-left: auto;
 }
 .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .status.s-open, .status.s-always { background: var(--ok-tint); color: var(--ok); }
@@ -392,9 +392,9 @@ html.sheet-open { overflow: hidden; }
   .pc-head span { font-size: 9pt; }
   .pc table { border-collapse: collapse; width: 100%; grid-column: 1 / -1; }
   .pc tbody { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column; }
-  .pc tr { display: grid; grid-template-columns: 27mm 1fr; gap: 2mm; padding: 1.6mm 4mm; border-bottom: .2mm solid #999; }
+  .pc tr { display: grid; grid-template-columns: 29mm 1fr; gap: 2mm; padding: 1.6mm 3.5mm; border-bottom: .2mm solid #999; }
   .pc td { font-size: 9pt; line-height: 1.25; }
-  .pc td:first-child { font-weight: 700; font-size: 10pt; font-variant-numeric: tabular-nums; }
+  .pc td:first-child { font-weight: 700; font-size: 9.5pt; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .pc-foot { grid-column: 1 / -1; margin: 0; padding: 2mm 4mm; font-size: 9pt; }
   #printplan h1 { font: 500 22pt/1.1 var(--display); margin: 0 0 4mm; max-width: none; }
   #printplan h2 { font-size: 12pt; margin: 5mm 0 1mm; }

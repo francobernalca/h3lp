@@ -96,7 +96,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | status.open | Open now, until {t} | Ouvert jusqu’à {t} |
 | status.opens | Opens {t} | Ouvre à {t} |
 | status.opensDay | Opens {day} {t} | Ouvre {day} à {t} |
-| status.confirm | Call to confirm hours | Appelez pour confirmer les heures |
+| status.confirm | Call to confirm hours | Heures à confirmer |
 | status.online | Online, any time | En ligne, en tout temps |
 | days.1 | Sun | dim. |
 | days.2 | Mon | lun. |
