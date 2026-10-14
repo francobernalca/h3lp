@@ -65,12 +65,24 @@ for required in index.html _headers; do
 done
 
 # Anything that must never ship, even if a manifest line was careless.
-for forbidden in .git .github node_modules .env deploy.ps1 ship.ps1 scripts wrangler.toml wrangler.jsonc .wrangler; do
+for forbidden in .git .github node_modules .env deploy.ps1 ship.ps1 scripts wrangler.toml wrangler.jsonc .wrangler docs tests tools icons art; do
   if [ -e "$OUT/$forbidden" ]; then
     echo "BLOCKED: $OUT/$forbidden must never be published." >&2
     exit 1
   fi
 done
+# No email address may ship in a public file (the report link assembles one at click time).
+if grep -rIlE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' "$OUT" | grep -q .; then
+  echo "BLOCKED: an email address appears in a published file:" >&2
+  grep -rIlE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' "$OUT" >&2
+  exit 1
+fi
+
+# Every file the service worker precaches must be published, or install fails offline.
+for f in $(grep -oE '"(assets/[^"]+|[a-z0-9.-]+\.(html|css|js|webmanifest))"' sw.js | tr -d '"'); do
+  [ -f "$OUT/$f" ] || { echo "BLOCKED: sw.js precaches $f but it is not published." >&2; exit 1; }
+done
+
 if find "$OUT" \( -name '*.map' -o -name '.env*' -o -name '*.ps1' \) | grep -q .; then
   echo "BLOCKED: source maps, env files or scripts present in $OUT." >&2
   exit 1

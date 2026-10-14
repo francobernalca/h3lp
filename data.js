@@ -1,7 +1,7 @@
 /* h3lp data and words, EN and FR. Pure data: no DOM, nothing stored, nothing sent.
    - R: every service. Numbers, keywords and links were verified by hand (June and July
      2026, French layer 2026-07-16). Change one only after checking it at the source.
-   - FR titles only where the organisation's own French name was verified; FR links only
+   - FR titles only where the organisation’s own French name was verified; FR links only
      where its French page was verified live. 19 entries keep their English title on purpose.
    - scope: on = anywhere in Ontario, ca = across Canada, finder = a search tool.
      region = a local service; it is shown only for cities in that region. */
@@ -12,20 +12,20 @@
   "use strict";
 
   var TABS = [
-    {"id":"talk","icon":"talk","en":{"label":"Talk to someone","title":"Someone to talk to","note":"Free · confidential · most 24/7"},"fr":{"label":"Parler à quelqu'un","title":"Quelqu'un à qui parler","note":"Gratuit · confidentiel · souvent 24/7"}},
-    {"id":"food","icon":"food","en":{"label":"Food today","title":"A meal today","note":"No one should go to sleep hungry."},"fr":{"label":"Manger aujourd'hui","title":"Un repas aujourd'hui","note":"Personne ne devrait s'endormir le ventre vide."}},
-    {"id":"safe","icon":"safe","en":{"label":"A safe place","title":"If you're not safe","note":"It's not your fault. You have options."},"fr":{"label":"Un endroit sûr","title":"Si vous n'êtes pas en sécurité","note":"Ce n'est pas votre faute. Vous avez des options."}},
+    {"id":"talk","icon":"talk","en":{"label":"Talk to someone","title":"Someone to talk to","note":"Free · confidential · most 24/7"},"fr":{"label":"Parler à quelqu’un","title":"Quelqu’un à qui parler","note":"Gratuit · confidentiel · souvent 24/7"}},
+    {"id":"food","icon":"food","en":{"label":"Food today","title":"A meal today","note":"No one should go to sleep hungry."},"fr":{"label":"Manger aujourd’hui","title":"Un repas aujourd’hui","note":"Personne ne devrait s’endormir le ventre vide."}},
+    {"id":"safe","icon":"safe","en":{"label":"A safe place","title":"If you’re not safe","note":"It’s not your fault. You have options."},"fr":{"label":"Un endroit sûr","title":"Si vous n’êtes pas en sécurité","note":"Ce n’est pas votre faute. Vous avez des options."}},
     {"id":"comm","icon":"community","en":{"label":"Community","title":"Community to belong to","note":"A safe place to show up."},"fr":{"label":"Communauté","title":"Une communauté où trouver sa place","note":"Un endroit accueillant, sans jugement."}},
-    {"id":"play","icon":"sport","en":{"label":"Sports for youth","title":"Get a kid into sport","note":"Cost shouldn't keep them out."},"fr":{"label":"Sports pour les jeunes","title":"Inscrire un enfant au sport","note":"Le coût ne devrait pas les en priver."}},
-    {"id":"new","icon":"new","en":{"label":"New to Canada & legal","title":"New to Canada & legal help","note":"You are not alone here."},"fr":{"label":"Nouveau au Canada et juridique","title":"Nouveaux arrivants et aide juridique","note":"Vous n'êtes pas seul(e) ici."}},
-    {"id":"money","icon":"money","en":{"label":"Money basics","title":"A first step with money","note":"Free, trustworthy, nothing to buy."},"fr":{"label":"L'argent, les bases","title":"Un premier pas avec l'argent","note":"Gratuit, fiable, rien à acheter."}},
+    {"id":"play","icon":"sport","en":{"label":"Sports for youth","title":"Get a kid into sport","note":"Cost shouldn’t keep them out."},"fr":{"label":"Sports pour les jeunes","title":"Inscrire un enfant au sport","note":"Le coût ne devrait pas les en priver."}},
+    {"id":"new","icon":"new","en":{"label":"New to Canada & legal","title":"New to Canada & legal help","note":"You are not alone here."},"fr":{"label":"Nouveau au Canada et juridique","title":"Nouveaux arrivants et aide juridique","note":"Vous n’êtes pas seul(e) ici."}},
+    {"id":"money","icon":"money","en":{"label":"Money basics","title":"A first step with money","note":"Free, trustworthy, nothing to buy."},"fr":{"label":"L’argent, les bases","title":"Un premier pas avec l’argent","note":"Gratuit, fiable, rien à acheter."}},
     {"id":"all","icon":"compass","en":{"label":"Not sure","title":"Not sure where to start?","note":"One call covers almost anything."},"fr":{"label":"Je ne sais pas trop","title":"Vous ne savez pas par où commencer?","note":"Un seul appel couvre presque tout."}}
   ];
 
   /* Cities: the slug is the old #hash form, kept so shared links still open the same view.
-     lat/lon are fixed city centres, used only to ask Open-Meteo for that city's forecast. */
+     lat/lon are fixed city centres, used only to ask Open-Meteo for that city’s forecast. */
   var CITIES = [
-    { slug: "", en: "All of Ontario", fr: "Tout l'Ontario" },
+    { slug: "", en: "All of Ontario", fr: "Tout l’Ontario" },
     { slug: "toronto", en: "Toronto", region: "toronto", lat: 43.6532, lon: -79.3832 },
     { slug: "ottawa", en: "Ottawa", region: "ottawa", lat: 45.4215, lon: -75.6972 },
     { slug: "mississauga", en: "Mississauga", lat: 43.589, lon: -79.6441 },
@@ -56,7 +56,7 @@
   ];
 
   var R = [
-    {"id":"988","svc":"988","scope":"ca","cats":["talk","all"],"hot":true,"who":"Right now · 24/7","title":"988 Suicide Crisis Helpline","hours":"24/7","body":"If you're thinking about suicide, or worried about someone who is. Call or text 988 any time, free, anywhere in Canada.","actions":[{"label":"Call or text 988","href":"tel:988"}],"fr":{"who":"Tout de suite · 24/7","title":"9-8-8 : Ligne d'aide en cas de crise de suicide","body":"Si vous pensez au suicide, ou si vous vous inquiétez pour quelqu'un. Appelez ou textez le 988 à toute heure, gratuitement, partout au Canada.","actions":[{"label":"Appelez ou textez le 988","href":"tel:988"}]}},
+    {"id":"988","svc":"988","scope":"ca","cats":["talk","all"],"hot":true,"who":"Right now · 24/7","title":"988 Suicide Crisis Helpline","hours":"24/7","body":"If you're thinking about suicide, or worried about someone who is. Call or text 988 any time, free, anywhere in Canada.","actions":[{"label":"Call 988","href":"tel:988"},{"label":"Text 988","href":"sms:988"}],"fr":{"who":"Tout de suite · 24/7","title":"9-8-8 : Ligne d'aide en cas de crise de suicide","body":"Si vous pensez au suicide, ou si vous vous inquiétez pour quelqu'un. Appelez ou textez le 988 à toute heure, gratuitement, partout au Canada.","actions":[{"label":"Appelez le 988","href":"tel:988"},{"label":"Textez le 988","href":"sms:988"}]}},
     {"id":"connex","svc":"connex","scope":"on","cats":["talk"],"who":"Ontario · addiction & mental health","title":"ConnexOntario","hours":"24/7","body":"Free, confidential, government-funded line for drugs, alcohol, gambling, or mental health. They find local treatment for you, even with no insurance. Open 24/7.","actions":[{"label":"Call 1-866-531-2600","href":"tel:18665312600"},{"label":"Website","href":"https://connexontario.ca","alt":true}],"fr":{"who":"Ontario · dépendances et santé mentale","body":"Une ligne gratuite, confidentielle et financée par le gouvernement pour la drogue, l'alcool, le jeu ou la santé mentale. On trouve un traitement local pour vous, même sans assurance. Ouvert 24/7.","actions":[{"label":"Appelez le 1 866 531-2600","href":"tel:18665312600"},{"label":"Site Web","href":"https://www.connexontario.ca/fr-ca","alt":true}]}},
     {"id":"khp","svc":"khp","scope":"on","cats":["talk"],"who":"Ontario · ages 5–29","title":"Kids Help Phone","hours":"24/7","body":"For kids, teens, and young adults. Call any time, or text CONNECT to 686868. Free, confidential, and they actually get it.","actions":[{"label":"Call 1-800-668-6868","href":"tel:18006686868"},{"label":"Text 686868","href":"sms:686868?body=CONNECT","alt":true}],"fr":{"who":"Ontario · 5 à 29 ans","title":"Jeunesse, J'écoute","body":"Pour les enfants, les ados et les jeunes adultes. Appelez à toute heure, ou textez PARLER au 686868. Gratuit, confidentiel, et on vous comprend vraiment.","actions":[{"label":"Appelez le 1 800 668-6868","href":"tel:18006686868"},{"label":"Textez PARLER au 686868","href":"sms:686868?body=PARLER","alt":true}]}},
     {"id":"811","svc":"811","scope":"on","cats":["talk","all"],"who":"Ontario · a nurse, free","title":"Health811","hours":"24/7","body":"Dial 811 to talk to a registered nurse, free, 24/7, about any health worry, including mental health or substance use. No health card needed.","actions":[{"label":"Call 811","href":"tel:811"},{"label":"Website","href":"https://health811.ontario.ca","alt":true}],"fr":{"who":"Ontario · une infirmière, gratuit","title":"Santé811","body":"Composez le 811 pour parler à une infirmière autorisée, gratuitement, 24/7, pour toute inquiétude de santé, y compris la santé mentale ou la consommation. Aucune carte Santé requise.","actions":[{"label":"Appelez le 811","href":"tel:811"},{"label":"Site Web","href":"https://health811.ontario.ca/static/fr-ca/guest/home","alt":true}]}},
@@ -104,67 +104,67 @@
   ];
 
   var TIPS = [
-    {"h":"Avoid high-interest debt","p":"Payday loans and “instant pay” apps are the most expensive way to borrow. Try 211 or a food bank for emergency basics first. It's free, not a loan.","hFr":"Évitez les dettes à intérêt élevé","pFr":"Les prêts sur salaire et les applications de « paie instantanée » sont la façon la plus chère d'emprunter. Pour les besoins de base urgents, essayez d'abord le 211 ou une banque alimentaire. C'est gratuit, pas un prêt."},
-    {"h":"Pay highest-interest first","p":"If you owe on more than one thing, put extra money toward the debt with the biggest interest rate. It costs you the most each month.","hFr":"Remboursez d'abord le taux le plus élevé","pFr":"Si vous devez de l'argent à plus d'un endroit, mettez le surplus sur la dette au taux d'intérêt le plus élevé. C'est elle qui vous coûte le plus chaque mois."},
-    {"h":"A tiny buffer beats a loan","p":"Even $5–10 set aside when you can means an unexpected cost doesn't force you into borrowing at high interest later.","hFr":"Un petit coussin vaut mieux qu'un prêt","pFr":"Même 5 à 10 $ mis de côté quand c'est possible, et un imprévu ne vous force plus à emprunter à taux élevé plus tard."},
-    {"h":"Prices rising? Review, don't borrow","p":"When costs go up, the FCAC's advice is to trim expenses and avoid taking on new debt, rather than covering the gap with credit.","hFr":"Les prix montent? Révisez, n'empruntez pas","pFr":"Quand les coûts augmentent, l'ACFC conseille de réduire les dépenses et d'éviter de nouvelles dettes, plutôt que de combler l'écart avec du crédit."}
+    {"h":"Avoid high-interest debt","p":"Payday loans and “instant pay” apps are the most expensive way to borrow. Try 211 or a food bank for emergency basics first. It’s free, not a loan.","hFr":"Évitez les dettes à intérêt élevé","pFr":"Les prêts sur salaire et les applications de « paie instantanée » sont la façon la plus chère d’emprunter. Pour les besoins de base urgents, essayez d’abord le 211 ou une banque alimentaire. C’est gratuit, pas un prêt."},
+    {"h":"Pay highest-interest first","p":"If you owe on more than one thing, put extra money toward the debt with the biggest interest rate. It costs you the most each month.","hFr":"Remboursez d’abord le taux le plus élevé","pFr":"Si vous devez de l’argent à plus d’un endroit, mettez le surplus sur la dette au taux d’intérêt le plus élevé. C’est elle qui vous coûte le plus chaque mois."},
+    {"h":"A tiny buffer beats a loan","p":"Even $5–10 set aside when you can means an unexpected cost doesn’t force you into borrowing at high interest later.","hFr":"Un petit coussin vaut mieux qu’un prêt","pFr":"Même 5 à 10 $ mis de côté quand c’est possible, et un imprévu ne vous force plus à emprunter à taux élevé plus tard."},
+    {"h":"Prices rising? Review, don’t borrow","p":"When costs go up, the FCAC’s advice is to trim expenses and avoid taking on new debt, rather than covering the gap with credit.","hFr":"Les prix montent? Révisez, n’empruntez pas","pFr":"Quand les coûts augmentent, l’ACFC conseille de réduire les dépenses et d’éviter de nouvelles dettes, plutôt que de combler l’écart avec du crédit."}
   ];
   var SAY = {
     "en": {
       "talk": [
-        "I don't know where to start. I just need to talk to someone.",
-        "I'm not doing okay, and I don't want to be alone with this right now."
+        "I don’t know where to start. I just need to talk to someone.",
+        "I’m not doing okay, and I don’t want to be alone with this right now."
       ],
       "safe": [
-        "I don't feel safe at home. Can you help me understand my options?",
-        "Someone close to me is scaring me. I don't know what to do."
+        "I don’t feel safe at home. Can you help me understand my options?",
+        "Someone close to me is scaring me. I don’t know what to do."
       ]
     },
     "fr": {
       "talk": [
-        "Je ne sais pas par où commencer. J'ai juste besoin de parler à quelqu'un.",
+        "Je ne sais pas par où commencer. J’ai juste besoin de parler à quelqu’un.",
         "Ça ne va pas, et je ne veux pas rester seul(e) avec ça en ce moment."
       ],
       "safe": [
-        "Je ne me sens pas en sécurité chez moi. Pouvez-vous m'aider à comprendre mes options?",
-        "Quelqu'un de proche me fait peur. Je ne sais pas quoi faire."
+        "Je ne me sens pas en sécurité chez moi. Pouvez-vous m’aider à comprendre mes options?",
+        "Quelqu’un de proche me fait peur. Je ne sais pas quoi faire."
       ]
     }
   };
   /* {here} becomes "across Ontario" or "in Toronto"; {hereAll} names the chosen city */
   var INTRO = {
     "en": {
-      "talk": "Whatever you're carrying, whether it's drugs, drinking, panic, grief, or just feeling like there's no way out, trained responders are ready to listen. Free, confidential crisis lines and support services are available 24/7 {here}. There are options for everyone, plus dedicated lines built for youth, Indigenous, Black, 2SLGBTQ+, Muslim, and student communities. Start here.",
-      "food": "Free food banks and meal programs {here}. Most don't ask for ID or a reason. Pick your city and your nearest option comes first.",
+      "talk": "Whatever you’re carrying, whether it’s drugs, drinking, panic, grief, or just feeling like there’s no way out, trained responders are ready to listen. Free, confidential crisis lines and support services are available 24/7 {here}. There are options for everyone, plus dedicated lines built for youth, Indigenous, Black, 2SLGBTQ+, Muslim, and student communities. Start here.",
+      "food": "Free food banks and meal programs {here}. Most don’t ask for ID or a reason. Pick your city and your nearest option comes first.",
       "safe": "If someone is hurting you, scaring you, or controlling you, these lines are private and free {here}. They help you understand your choices and find a safe place, without ever forcing you into anything. Need to leave fast? The <b>Quick exit</b> button up top instantly swaps this page for the weather.",
       "comm": "Recovery and a fresh start are easier around people. Drop-in centres, youth hubs, recovery and faith groups. A healthy way to fill the time and belong, {here}.",
       "play": "Sport keeps kids and teens busy, connected, and well. These help families {here} cover registration and gear, even when money is tight.",
       "new": "Arriving somewhere new and not knowing what exists is its own kind of hard. Ontario has free settlement workers and free legal help, for jobs, language, housing, benefits, and your rights. Start here, {here}.",
       "money": "Money stress makes everything harder. These are free Government of Canada tools, with no selling and no catch. Start with one small thing.",
-      "all": "If your situation doesn't fit a box, start here. One free call connects you to a real person who can point you to food, housing, health, money, and more, {hereAll}."
+      "all": "If your situation doesn’t fit a box, start here. One free call connects you to a real person who can point you to food, housing, health, money, and more, {hereAll}."
     },
     "fr": {
-      "talk": "Peu importe ce que vous portez, que ce soit la drogue, l'alcool, la panique, le deuil, ou juste l'impression qu'il n'y a pas d'issue, des intervenants formés sont prêts à écouter. Des lignes de crise et des services de soutien gratuits et confidentiels sont offerts 24/7 {here}. Il y a des options pour tout le monde, avec des lignes dédiées pour les jeunes et pour les communautés autochtones, noires, 2SLGBTQ+, musulmanes et étudiantes. Commencez ici.",
-      "food": "Des banques alimentaires et des programmes de repas gratuits {here}. La plupart ne demandent ni pièce d'identité ni justification. Choisissez votre ville et l'option la plus proche s'affiche en premier.",
-      "safe": "Si quelqu'un vous fait du mal, vous fait peur ou vous contrôle, ces lignes sont privées et gratuites {here}. Elles vous aident à comprendre vos choix et à trouver un endroit sûr, sans jamais rien vous imposer. Besoin de partir vite? Le bouton <b>Sortie rapide</b> en haut remplace instantanément cette page par la météo.",
-      "comm": "Le rétablissement et un nouveau départ sont plus faciles quand on est bien entouré. Centres d'accueil, carrefours jeunesse, groupes de rétablissement et communautés de foi. Une façon saine d'occuper le temps et de trouver sa place, {here}.",
-      "play": "Le sport garde les enfants et les ados occupés, connectés et en santé. Ces programmes aident les familles {here} à couvrir l'inscription et l'équipement, même quand l'argent est serré.",
-      "new": "Arriver quelque part sans savoir ce qui existe, c'est déjà difficile en soi. L'Ontario offre gratuitement des travailleurs d'établissement et de l'aide juridique : emploi, langue, logement, prestations et vos droits. Commencez ici, {here}.",
+      "talk": "Peu importe ce que vous portez, que ce soit la drogue, l’alcool, la panique, le deuil, ou juste l’impression qu’il n’y a pas d’issue, des intervenants formés sont prêts à écouter. Des lignes de crise et des services de soutien gratuits et confidentiels sont offerts 24/7 {here}. Il y a des options pour tout le monde, avec des lignes dédiées pour les jeunes et pour les communautés autochtones, noires, 2SLGBTQ+, musulmanes et étudiantes. Commencez ici.",
+      "food": "Des banques alimentaires et des programmes de repas gratuits {here}. La plupart ne demandent ni pièce d’identité ni justification. Choisissez votre ville et l’option la plus proche s’affiche en premier.",
+      "safe": "Si quelqu’un vous fait du mal, vous fait peur ou vous contrôle, ces lignes sont privées et gratuites {here}. Elles vous aident à comprendre vos choix et à trouver un endroit sûr, sans jamais rien vous imposer. Besoin de partir vite? Le bouton <b>Sortie rapide</b> en haut remplace instantanément cette page par la météo.",
+      "comm": "Le rétablissement et un nouveau départ sont plus faciles quand on est bien entouré. Centres d’accueil, carrefours jeunesse, groupes de rétablissement et communautés de foi. Une façon saine d’occuper le temps et de trouver sa place, {here}.",
+      "play": "Le sport garde les enfants et les ados occupés, connectés et en santé. Ces programmes aident les familles {here} à couvrir l’inscription et l’équipement, même quand l’argent est serré.",
+      "new": "Arriver quelque part sans savoir ce qui existe, c’est déjà difficile en soi. L’Ontario offre gratuitement des travailleurs d’établissement et de l’aide juridique : emploi, langue, logement, prestations et vos droits. Commencez ici, {here}.",
       "money": "Le stress financier rend tout plus difficile. Voici des outils gratuits du gouvernement du Canada, sans vente et sans piège. Commencez par une petite chose.",
-      "all": "Si votre situation n'entre dans aucune case, commencez ici. Un seul appel gratuit vous met en contact avec une vraie personne qui peut vous orienter : nourriture, logement, santé, argent et plus, {hereAll}."
+      "all": "Si votre situation n’entre dans aucune case, commencez ici. Un seul appel gratuit vous met en contact avec une vraie personne qui peut vous orienter : nourriture, logement, santé, argent et plus, {hereAll}."
     }
   };
 
   /* Situation chips under the search field. ids = a hand-picked list; otherwise the tab. */
   var SITUATIONS = [
-    { id: "talk", icon: "talk", tab: "talk", en: "I need to talk to someone", fr: "J'ai besoin de parler à quelqu'un" },
+    { id: "talk", icon: "talk", tab: "talk", en: "I need to talk to someone", fr: "J’ai besoin de parler à quelqu’un" },
     { id: "unsafe", icon: "safe", tab: "safe", crisis: "abuse", ids: ["911", "awhl", "khpsafe", "211safe", "ssl", "legalaid"],
-      en: "I'm not safe at home", fr: "Je ne suis pas en sécurité chez moi" },
-    { id: "food", icon: "food", tab: "food", en: "No food today", fr: "Rien à manger aujourd'hui" },
+      en: "I’m not safe at home", fr: "Je ne suis pas en sécurité chez moi" },
+    { id: "food", icon: "food", tab: "food", en: "No food today", fr: "Rien à manger aujourd’hui" },
     { id: "sleep", icon: "bed", tab: "safe", ids: ["211safe", "211", "awhl", "khpsafe"], weather: true,
       en: "Nowhere to sleep tonight", fr: "Nulle part où dormir ce soir" },
     { id: "new", icon: "new", tab: "new", en: "New to Canada", fr: "Nouveau au Canada" },
-    { id: "money", icon: "money", tab: "money", en: "Money trouble", fr: "Problèmes d'argent" }
+    { id: "money", icon: "money", tab: "money", en: "Money trouble", fr: "Problèmes d’argent" }
   ];
 
   /* The three ways in, after 988.ca */
@@ -177,12 +177,12 @@
   /* Save key numbers: what goes into the contacts file */
   var CONTACTS = [
     { tel: "988", en: "988 Suicide Crisis Helpline", fr: "9-8-8 : Ligne d'aide en cas de crise de suicide", noteEn: "Call or text 988. Free, 24/7.", noteFr: "Appelez ou textez le 988. Gratuit, 24/7." },
-    { tel: "911", en: "911 Emergency", fr: "911 Urgence", noteEn: "Someone is in danger right now.", noteFr: "Quelqu'un est en danger en ce moment." },
+    { tel: "911", en: "911 Emergency", fr: "911 Urgence", noteEn: "Someone is in danger right now.", noteFr: "Quelqu’un est en danger en ce moment." },
     { tel: "211", en: "211 Ontario", fr: "211 Ontario", noteEn: "Any help: food, shelter, money. Free, 24/7, 150+ languages.", noteFr: "Toute aide : nourriture, refuge, argent. Gratuit, 24/7, plus de 150 langues." },
     { tel: "811", en: "Health811", fr: "Santé811", noteEn: "A registered nurse. Free, 24/7.", noteFr: "Une infirmière autorisée. Gratuit, 24/7." },
     { tel: "+18006686868", en: "Kids Help Phone", fr: "Jeunesse, J'écoute", noteEn: "Or text CONNECT to 686868. Free, 24/7.", noteFr: "Ou textez PARLER au 686868. Gratuit, 24/7." },
     { tel: "+18665312600", en: "ConnexOntario", fr: "ConnexOntario", noteEn: "Addiction and mental health. Free, 24/7.", noteFr: "Dépendances et santé mentale. Gratuit, 24/7." },
-    { tel: "+18668630511", en: "Assaulted Women's Helpline", fr: "Assaulted Women's Helpline", noteEn: "Abuse from a partner or family member. Free, 24/7.", noteFr: "Violence d'un partenaire ou d'un membre de la famille. Gratuit, 24/7." },
+    { tel: "+18668630511", en: "Assaulted Women's Helpline", fr: "Assaulted Women's Helpline", noteEn: "Abuse from a partner or family member. Free, 24/7.", noteFr: "Violence d’un partenaire ou d’un membre de la famille. Gratuit, 24/7." },
     { tel: "+18662991011", en: "Seniors Safety Line", fr: "Ligne d'assistance aux personnes âgées", noteEn: "Older adults facing abuse. Free, 24/7.", noteFr: "Personnes aînées victimes de maltraitance. Gratuit, 24/7." }
   ];
 
@@ -204,11 +204,11 @@
       shiftLive: "Shift pressed {n} of 3 times",
       brandAria: "h3lp, back to the top",
       langBtn: "FR", langBtnLang: "fr", langBtnAria: "Passer au français",
-      h1: "You don't have to figure this out alone.",
+      h1: "You don’t have to figure this out alone.",
       lede: "Free help across Ontario, checked by hand. What you type here stays on this device.",
-      searchLabel: "What's going on?",
+      searchLabel: "What’s going on?",
       searchPlaceholder: "Say it in your own words",
-      searchHelp: "For example: I can't pay my rent. Nothing you type is sent or saved.",
+      searchHelp: "For example: I can’t pay my rent. Nothing you type is sent or saved.",
       searchClear: "Clear",
       results: "{n} services match", result1: "1 service matches",
       noMatch: "Nothing matched those words yet. 211 can help with almost anything, any time.",
@@ -225,12 +225,12 @@
       paths: {
         now: { label: "I need help right now", sub: "Call or text, any hour", title: "Help right now",
           lead: "If you or someone else is in danger, call 911. To talk about suicide, a crisis or anything that feels too heavy, call or text 988. Both are free, any hour." },
-        unsure: { label: "I'm not sure what I need", sub: "One call to 211 covers almost anything", title: "Not sure where to start?" },
-        someone: { label: "I'm worried about someone", sub: "How to help, and who can help you help", title: "When you're worried about someone",
-          lead: "You don't need special training to help. These steps come from crisis lines.",
+        unsure: { label: "I’m not sure what I need", sub: "One call to 211 covers almost anything", title: "Not sure where to start?" },
+        someone: { label: "I’m worried about someone", sub: "How to help, and who can help you help", title: "When you’re worried about someone",
+          lead: "You don’t need special training to help. These steps come from crisis lines.",
           steps: [
             "Ask how they are, and listen. It is okay to ask them directly if they are thinking about suicide. Asking does not put the idea in their head.",
-            "You don't have to fix it. Stay calm, stay with them, and take them seriously.",
+            "You don’t have to fix it. Stay calm, stay with them, and take them seriously.",
             "Help them reach support. You can call or text 988 together, any hour.",
             "If they are in danger right now, call 911. Stay with them if it is safe for you.",
             "Look after yourself too. 988 also supports people who are worried about someone."
@@ -246,7 +246,7 @@
       hintAll: "{n} services in this list. Your city changes the food listings; phone lines work anywhere in Ontario.",
       hintCity: "{n} services in this list for {city}. Local food help comes first; phone lines work anywhere in Ontario.",
       saySummary: "Not sure what to say? Tap for opening lines",
-      sayReassure: "You don't need the right words. They're trained to carry the conversation from there.",
+      sayReassure: "You don’t need the right words. They’re trained to carry the conversation from there.",
       status: { always: "24/7", open: "Open now, until {t}", opens: "Opens {t}", opensDay: "Opens {day} {t}", confirm: "Call to confirm hours", online: "Online, any time" },
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       copyNumber: "Copy number", copied: "Copied", share: "Share", shared: "Link copied",
@@ -298,7 +298,7 @@
           { t: "My reasons to keep going", h: "Optional. People, plans, pets or things I care about.", p: "For example: my dog, my sister, seeing the lake" }
         ],
         modeTitle: "Keep it private",
-        modePrint: "Don't save, just print",
+        modePrint: "Don’t save, just print",
         modeSave: "Save on this device",
         saveWarn: "Saved only in this browser, never sent anywhere. Anyone who uses this device could open it. On iPhone, Safari may erase it after 7 days without a visit, so print a copy or save it as an image too.",
         statusSaved: "Saved on this device.",
@@ -309,7 +309,7 @@
         printFoot: "In danger right now? Call 911. Call or text 988 any time. h3lp.francobernal.ca"
       },
       numbers: {
-        lead: "Adds these free lines to your phone's contacts. The file is made on this device; nothing is sent.",
+        lead: "Adds these free lines to your phone’s contacts. The file is made on this device; nothing is sent.",
         save: "Save to contacts", after: "Open the downloaded file to add them to your contacts.",
         fileName: "h3lp-key-numbers.vcf"
       },
@@ -324,19 +324,20 @@
       pcSSL: "Seniors Safety Line, 24/7",
       pcFoot: "All lines are free and confidential. More help: h3lp.francobernal.ca",
       aboutTitle: "About h3lp",
-      about: "h3lp is a free signpost for Ontario, made by Franco Bernal. We don't run any of these services. We point you to trusted Ontario and Canada-wide organizations so you can reach real help directly. Every number was checked by hand; confirm local details by calling 211.",
+      about: "h3lp is a free signpost for Ontario, made by Franco Bernal. We don’t run any of these services. We point you to trusted Ontario and Canada-wide organizations so you can reach real help directly. Every number was checked by hand; confirm local details by calling 211.",
       privacyTitle: "Privacy",
-      privacy: "No account, no cookies, no tracking. What you type stays on this device. If you choose a city, h3lp asks Open-Meteo for that city's weather forecast; nothing about you is sent. After your first visit, h3lp works without a connection.",
+      privacy: "No account, no cookies, no tracking. What you type stays on this device. If you choose a city, h3lp asks Open-Meteo for that city’s weather forecast; nothing about you is sent. After your first visit, h3lp works without a connection.",
       report: "Report a broken link", reportSub: "Opens your email app.",
       reportSubject: "h3lp: a link or number needs fixing",
       sky: "The thin line at the top of the page follows the sky over Toronto right now.",
       sunrise: "Next sunrise: {t}.",
       danger: "In immediate danger? Call 911.",
-      quote: "\"Reason remains bulletproof, even when written in code.\"",
+      quote: "“Reason remains bulletproof, even when written in code.”",
       madeby: "Made by a civilian, for all civilians",
       cred: "© 2026 Franco Bernal · Free forever · Proudly built in Ontario, Canada",
       here: "across Ontario", hereCity: "in {city}", hereAll: "anywhere in Ontario", hereAllCity: "including {city}",
-      nfTitle: "This page doesn't exist.",
+      facts: { checked: "Every number checked by hand, July 2026", lang: "English and French", offline: "Works offline after your first visit" },
+      nfTitle: "This page doesn’t exist.",
       nfBody: "The link may be out of date, or the address slightly off.",
       nfHelp: "Need help now? Call or text 988, any hour. If someone is in danger, call 911. For anything else, call 211.",
       nfHome: "Back to h3lp",
@@ -344,63 +345,63 @@
       ns211: "Full list of local services: 211ontario.ca"
     },
     fr: {
-      docTitle: "h3lp · de l'aide gratuite et vérifiée, partout en Ontario",
-      metaDesc: "h3lp est un carrefour gratuit et convivial qui relie tout le monde en Ontario à de l'aide réelle et vérifiée : quelqu'un à qui parler, un repas aujourd'hui, un endroit sûr, une communauté, du sport gratuit pour les jeunes, du soutien aux nouveaux arrivants, de l'aide juridique et les bases de l'argent. Sans inscription. Sans traçage.",
-      skip: "Aller à l'aide",
-      stripLabel: "Lignes d'urgence",
-      stripNote: "Vous pensez au suicide, ou quelqu'un est en danger?",
-      call988: "Appeler le 988", call988Short: "988", call988Aria: "Appeler le 988, la ligne d'aide en cas de crise de suicide",
-      text988: "Texto au 988", text988Short: "Texto", text988Aria: "Texter le 988, la ligne d'aide en cas de crise de suicide",
+      docTitle: "h3lp · de l’aide gratuite et vérifiée, partout en Ontario",
+      metaDesc: "h3lp est un carrefour gratuit et convivial qui relie tout le monde en Ontario à de l’aide réelle et vérifiée : quelqu’un à qui parler, un repas aujourd’hui, un endroit sûr, une communauté, du sport gratuit pour les jeunes, du soutien aux nouveaux arrivants, de l’aide juridique et les bases de l’argent. Sans inscription. Sans traçage.",
+      skip: "Aller à l’aide",
+      stripLabel: "Lignes d’urgence",
+      stripNote: "Vous pensez au suicide, ou quelqu’un est en danger?",
+      call988: "Appeler le 988", call988Short: "988", call988Aria: "Appeler le 988, la ligne d’aide en cas de crise de suicide",
+      text988: "Texto au 988", text988Short: "Texto", text988Aria: "Texter le 988, la ligne d’aide en cas de crise de suicide",
       call911: "Appeler le 911", call911Short: "911", call911Aria: "Appeler le 911, urgence",
       exit: "Sortie rapide", exitShort: "Sortir", exitAria: "Sortie rapide : quitter ce site maintenant et ouvrir la météo",
       shiftHint: "ou appuyez 3 fois sur Maj",
       shiftLive: "Touche Maj : {n} sur 3",
       brandAria: "h3lp, retour en haut",
       langBtn: "EN", langBtnLang: "en", langBtnAria: "Switch to English",
-      h1: "Vous n'avez pas à traverser ça seul(e).",
-      lede: "De l'aide gratuite partout en Ontario, vérifiée à la main. Ce que vous écrivez ici reste sur cet appareil.",
-      searchLabel: "Qu'est-ce qui se passe?",
+      h1: "Vous n’avez pas à traverser ça seul(e).",
+      lede: "De l’aide gratuite partout en Ontario, vérifiée à la main. Ce que vous écrivez ici reste sur cet appareil.",
+      searchLabel: "Qu’est-ce qui se passe?",
       searchPlaceholder: "Dites-le dans vos mots",
-      searchHelp: "Par exemple : je n'arrive pas à payer mon loyer. Rien de ce que vous écrivez n'est envoyé ni enregistré.",
+      searchHelp: "Par exemple : je n’arrive pas à payer mon loyer. Rien de ce que vous écrivez n’est envoyé ni enregistré.",
       searchClear: "Effacer",
       results: "{n} services correspondent", result1: "1 service correspond",
       noMatch: "Aucun résultat pour ces mots. Le 211 peut aider pour presque tout, à toute heure.",
       crisis: {
-        self: "Vous comptez. Vous pouvez parler à quelqu'un dès maintenant.",
-        abuse: "Ce n'est pas votre faute. Vous méritez d'être en sécurité. Vous pouvez parler à quelqu'un dès maintenant.",
-        overdose: "Si quelqu'un a trop consommé, appelez le 911 maintenant. Restez avec la personne si c'est sécuritaire.",
-        others: "Vous avez tendu la main, et ça compte. Vous pouvez parler à quelqu'un dès maintenant, avant que quelque chose arrive.",
+        self: "Vous comptez. Vous pouvez parler à quelqu’un dès maintenant.",
+        abuse: "Ce n’est pas votre faute. Vous méritez d’être en sécurité. Vous pouvez parler à quelqu’un dès maintenant.",
+        overdose: "Si quelqu’un a trop consommé, appelez le 911 maintenant. Restez avec la personne si c’est sécuritaire.",
+        others: "Vous avez tendu la main, et ça compte. Vous pouvez parler à quelqu’un dès maintenant, avant que quelque chose arrive.",
         someone: "Vous pouvez appeler ou texter le 988 ensemble, ou appeler pour savoir comment aider la personne."
       },
       seeAll: "Tout voir : {tab}",
       chipsLabel: "Ou touchez ce qui vous ressemble",
       pathsLabel: "Ou commencez ici",
       paths: {
-        now: { label: "J'ai besoin d'aide tout de suite", sub: "Appel ou texto, à toute heure", title: "De l'aide tout de suite",
-          lead: "Si vous ou quelqu'un d'autre êtes en danger, appelez le 911. Pour parler de suicide, d'une crise ou de tout ce qui semble trop lourd, appelez ou textez le 988. Les deux sont gratuits, à toute heure." },
-        unsure: { label: "Je ne sais pas trop ce qu'il me faut", sub: "Un appel au 211 couvre presque tout", title: "Vous ne savez pas par où commencer?" },
-        someone: { label: "Je m'inquiète pour quelqu'un", sub: "Comment aider, et qui peut vous aider à aider", title: "Quand vous vous inquiétez pour quelqu'un",
+        now: { label: "J’ai besoin d’aide tout de suite", sub: "Appel ou texto, à toute heure", title: "De l’aide tout de suite",
+          lead: "Si vous ou quelqu’un d’autre êtes en danger, appelez le 911. Pour parler de suicide, d’une crise ou de tout ce qui semble trop lourd, appelez ou textez le 988. Les deux sont gratuits, à toute heure." },
+        unsure: { label: "Je ne sais pas trop ce qu’il me faut", sub: "Un appel au 211 couvre presque tout", title: "Vous ne savez pas par où commencer?" },
+        someone: { label: "Je m’inquiète pour quelqu’un", sub: "Comment aider, et qui peut vous aider à aider", title: "Quand vous vous inquiétez pour quelqu’un",
           lead: "Pas besoin de formation spéciale pour aider. Ces étapes viennent des lignes de crise.",
           steps: [
-            "Demandez à la personne comment elle va, et écoutez. Vous pouvez lui demander directement si elle pense au suicide. Poser la question ne lui donne pas l'idée.",
-            "Vous n'avez pas à tout régler. Restez calme, restez avec elle et prenez-la au sérieux.",
+            "Demandez à la personne comment elle va, et écoutez. Vous pouvez lui demander directement si elle pense au suicide. Poser la question ne lui donne pas l’idée.",
+            "Vous n’avez pas à tout régler. Restez calme, restez avec elle et prenez-la au sérieux.",
             "Aidez-la à joindre du soutien. Vous pouvez appeler ou texter le 988 ensemble, à toute heure.",
-            "Si elle est en danger immédiat, appelez le 911. Restez avec elle si c'est sécuritaire pour vous.",
-            "Prenez soin de vous aussi. Le 988 soutient aussi les personnes inquiètes pour quelqu'un."
+            "Si elle est en danger immédiat, appelez le 911. Restez avec elle si c’est sécuritaire pour vous.",
+            "Prenez soin de vous aussi. Le 988 soutient aussi les personnes inquiètes pour quelqu’un."
           ] }
       },
-      whileYouWait: "En attendant, ou avant d'appeler",
+      whileYouWait: "En attendant, ou avant d’appeler",
       breatheLink: "Respirez avec moi pendant une minute",
       whereq: "Où êtes-vous?",
       cityNote: "Votre ville change les ressources alimentaires et la vérification météo. Les lignes téléphoniques fonctionnent partout en Ontario.",
       cityAria: "Choisissez votre ville en Ontario",
       browseTitle: "Parcourir par besoin",
-      backToBrowse: "Parcourir d'autres besoins",
+      backToBrowse: "Parcourir d’autres besoins",
       hintAll: "{n} services dans cette liste. Votre ville change les ressources alimentaires; les lignes téléphoniques fonctionnent partout en Ontario.",
-      hintCity: "{n} services dans cette liste pour {city}. L'aide alimentaire locale passe en premier; les lignes téléphoniques fonctionnent partout en Ontario.",
-      saySummary: "Vous ne savez pas quoi dire? Touchez pour des phrases d'ouverture",
-      sayReassure: "Vous n'avez pas besoin des mots parfaits. Ces personnes sont formées pour porter la conversation à partir de là.",
-      status: { always: "24/7", open: "Ouvert jusqu'à {t}", opens: "Ouvre à {t}", opensDay: "Ouvre {day} à {t}", confirm: "Appelez pour confirmer les heures", online: "En ligne, en tout temps" },
+      hintCity: "{n} services dans cette liste pour {city}. L’aide alimentaire locale passe en premier; les lignes téléphoniques fonctionnent partout en Ontario.",
+      saySummary: "Vous ne savez pas quoi dire? Touchez pour des phrases d’ouverture",
+      sayReassure: "Vous n’avez pas besoin des mots parfaits. Ces personnes sont formées pour porter la conversation à partir de là.",
+      status: { always: "24/7", open: "Ouvert jusqu’à {t}", opens: "Ouvre à {t}", opensDay: "Ouvre {day} à {t}", confirm: "Appelez pour confirmer les heures", online: "En ligne, en tout temps" },
       days: ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."],
       copyNumber: "Copier le numéro", copied: "Copié", share: "Partager", shared: "Lien copié",
       shareSuffix: "aide gratuite et vérifiée via h3lp",
@@ -408,52 +409,52 @@
       tagIn: "À {city}",
       scope: { on: "Partout en Ontario", ca: "Partout au Canada", finder: "Cherchez le plus proche" },
       exitHelp: "Pour partir vite, touchez Sortir en haut, ou appuyez 3 fois sur Maj.",
-      exitPrivacy: "La sortie rapide n'efface pas votre historique. Utilisez une fenêtre privée si quelqu'un vérifie votre téléphone.",
+      exitPrivacy: "La sortie rapide n’efface pas votre historique. Utilisez une fenêtre privée si quelqu’un vérifie votre téléphone.",
       weather: {
-        cold: "Ressenti de {t} ce soir à {city}. Si vous ou une personne que vous connaissez avez besoin d'un endroit chaud, appelez le 211, à toute heure.",
-        hot: "Ressenti de {t} aujourd'hui à {city}. Si vous ou une personne que vous connaissez avez besoin d'un endroit frais, appelez le 211, à toute heure.",
-        source: "Prévision d'Open-Meteo. Ce n'est pas un avertissement officiel.",
+        cold: "Ressenti de {t} ce soir à {city}. Si vous ou une personne que vous connaissez avez besoin d’un endroit chaud, appelez le 211, à toute heure.",
+        hot: "Ressenti de {t} aujourd’hui à {city}. Si vous ou une personne que vous connaissez avez besoin d’un endroit frais, appelez le 211, à toute heure.",
+        source: "Prévision d’Open-Meteo. Ce n’est pas un avertissement officiel.",
         call: "Appeler le 211", safe: "Endroits sûrs"
       },
       toolsTitle: "Des outils pour maintenant",
       toolsLead: "Des outils simples qui fonctionnent sur cet appareil, même hors ligne.",
       tools: {
-        breathe: { title: "Respirez avec moi", sub: "Une minute de respiration lente, ou un exercice d'ancrage." },
+        breathe: { title: "Respirez avec moi", sub: "Une minute de respiration lente, ou un exercice d’ancrage." },
         plan: { title: "Mon plan de sécurité", sub: "Notez ce qui vous aide, pour les moments difficiles. Imprimez-le, ou gardez-le ici." },
-        numbers: { title: "Enregistrer les numéros clés", sub: "Ajoutez le 988, le 211 et d'autres lignes gratuites à vos contacts, d'un seul geste." },
+        numbers: { title: "Enregistrer les numéros clés", sub: "Ajoutez le 988, le 211 et d’autres lignes gratuites à vos contacts, d’un seul geste." },
         wallet: { title: "Imprimer une carte portefeuille", sub: "Les numéros clés sur une petite carte pour votre portefeuille." }
       },
       close: "Fermer",
       breathe: {
-        label: "En attendant, ou avant d'appeler. Cela ne remplace pas une conversation avec quelqu'un.",
+        label: "En attendant, ou avant d’appeler. Cela ne remplace pas une conversation avec quelqu’un.",
         modeBreath: "Respiration lente", modeGround: "Ancrage 5-4-3-2-1",
         caution: "Respirez doucement, sans forcer. Arrêtez si vous avez un étourdissement.",
         start: "Commencer, une minute", pause: "Pause", resume: "Continuer", again: "Recommencer",
         ready: "Assis ou debout, comme vous êtes bien. Inspirez sur 4, expirez sur 6.",
         in: "Inspirez", out: "Expirez",
         left: "Encore {s} secondes",
-        done: "C'était une minute. Comment vous sentez-vous? Vous pouvez toujours parler à quelqu'un, à toute heure.",
+        done: "C’était une minute. Comment vous sentez-vous? Vous pouvez toujours parler à quelqu’un, à toute heure.",
         groundIntro: "Gardez les yeux ouverts. Regardez autour de vous et nommez, à voix haute ou dans votre tête :",
         ground: ["5 choses que vous voyez", "4 choses que vous pouvez toucher", "3 choses que vous entendez", "2 choses que vous pouvez sentir", "1 chose que vous pouvez goûter"],
-        next: "Suivant", back: "Retour", groundDone: "Bravo. Remarquez comment vous vous sentez maintenant. Vous pouvez toujours parler à quelqu'un, à toute heure."
+        next: "Suivant", back: "Retour", groundDone: "Bravo. Remarquez comment vous vous sentez maintenant. Vous pouvez toujours parler à quelqu’un, à toute heure."
       },
       plan: {
-        intro: "Un plan pour les moments difficiles, écrit quand vous vous sentez plus stable. Suivez les étapes dans l'ordre. Si une étape n'aide pas, passez à la suivante.",
-        credit: "Inspiré de l'intervention de planification de la sécurité de Stanley et Brown.",
-        notReplace: "Ce plan ne remplace pas l'aide professionnelle. En danger immédiat? Appelez le 911.",
+        intro: "Un plan pour les moments difficiles, écrit quand vous vous sentez plus stable. Suivez les étapes dans l’ordre. Si une étape n’aide pas, passez à la suivante.",
+        credit: "Inspiré de l’intervention de planification de la sécurité de Stanley et Brown.",
+        notReplace: "Ce plan ne remplace pas l’aide professionnelle. En danger immédiat? Appelez le 911.",
         steps: [
-          { t: "Mes signes d'alerte", h: "Les pensées, émotions ou situations qui me disent qu'un moment difficile commence peut-être.", p: "Par exemple : je ne réponds plus aux messages" },
+          { t: "Mes signes d’alerte", h: "Les pensées, émotions ou situations qui me disent qu’un moment difficile commence peut-être.", p: "Par exemple : je ne réponds plus aux messages" },
           { t: "Ce que je peux faire par moi-même pour tenir le coup", h: "Des petites choses qui me calment ou me changent les idées.", p: "Par exemple : marcher, une douche, de la musique" },
           { t: "Des gens et des lieux qui me changent les idées", h: "Avec qui je peux passer du temps, et où je peux aller, sans devoir en parler.", p: "Par exemple : ma cousine, la bibliothèque" },
-          { t: "Les personnes à qui je peux demander de l'aide", h: "Le nom et le numéro de personnes de confiance à qui dire comment je me sens.", p: "Nom et numéro de téléphone" },
+          { t: "Les personnes à qui je peux demander de l’aide", h: "Le nom et le numéro de personnes de confiance à qui dire comment je me sens.", p: "Nom et numéro de téléphone" },
           { t: "Lignes de crise et professionnels", h: "Des lignes à appeler ou à texter en tout temps. Ajoutez votre médecin ou votre intervenant ci-dessous.", p: "Mon médecin, mon intervenant ou ma clinique" },
-          { t: "Rendre mon espace plus sûr", h: "Ce que je peux faire pour rendre l'endroit où je suis plus sûr quand je me sens ainsi, comme demander à une personne de confiance de garder certaines choses pour moi pendant un temps.", p: "Ce que je vais faire" },
+          { t: "Rendre mon espace plus sûr", h: "Ce que je peux faire pour rendre l’endroit où je suis plus sûr quand je me sens ainsi, comme demander à une personne de confiance de garder certaines choses pour moi pendant un temps.", p: "Ce que je vais faire" },
           { t: "Mes raisons de continuer", h: "Facultatif. Des personnes, des projets, des animaux ou des choses qui comptent pour moi.", p: "Par exemple : mon chien, ma sœur, voir le lac" }
         ],
         modeTitle: "Gardez-le privé",
         modePrint: "Ne pas enregistrer, seulement imprimer",
         modeSave: "Enregistrer sur cet appareil",
-        saveWarn: "Enregistré seulement dans ce navigateur, jamais envoyé. Toute personne qui utilise cet appareil pourrait l'ouvrir. Sur iPhone, Safari peut l'effacer après 7 jours sans visite : imprimez-en une copie ou enregistrez-le aussi en image.",
+        saveWarn: "Enregistré seulement dans ce navigateur, jamais envoyé. Toute personne qui utilise cet appareil pourrait l’ouvrir. Sur iPhone, Safari peut l’effacer après 7 jours sans visite : imprimez-en une copie ou enregistrez-le aussi en image.",
         statusSaved: "Enregistré sur cet appareil.",
         statusTemp: "Non enregistré. Il disparaîtra quand vous fermerez cette page.",
         del: "Supprimer mon plan", deleted: "Votre plan a été supprimé de cet appareil.",
@@ -462,36 +463,37 @@
         printFoot: "En danger immédiat? Appelez le 911. Appelez ou textez le 988 à toute heure. h3lp.francobernal.ca"
       },
       numbers: {
-        lead: "Ajoute ces lignes gratuites aux contacts de votre téléphone. Le fichier est créé sur cet appareil; rien n'est envoyé.",
+        lead: "Ajoute ces lignes gratuites aux contacts de votre téléphone. Le fichier est créé sur cet appareil; rien n’est envoyé.",
         save: "Ajouter aux contacts", after: "Ouvrez le fichier téléchargé pour les ajouter à vos contacts.",
         fileName: "h3lp-numeros-cles.vcf"
       },
-      pcSub: "de l'aide gratuite et vérifiée en Ontario · gardez cette carte",
+      pcSub: "de l’aide gratuite et vérifiée en Ontario · gardez cette carte",
       pc988: "Ligne de crise suicide, appel ou texto, 24/7",
-      pc911: "Quelqu'un est en danger en ce moment",
+      pc911: "Quelqu’un est en danger en ce moment",
       pc211: "Toute aide : nourriture, refuge, argent, tout, 24/7",
       pc811: "Une infirmière autorisée, gratuit, 24/7",
       pcKids: "Jeunesse, J'écoute (ou textez PARLER au 686868), 24/7",
       pcConnex: "ConnexOntario : dépendances et santé mentale, 24/7",
       pcAWHL: "Assaulted Women's Helpline (violence conjugale), 24/7",
       pcSSL: "Ligne d'assistance aux personnes âgées, 24/7",
-      pcFoot: "Toutes ces lignes sont gratuites et confidentielles. Plus d'aide : h3lp.francobernal.ca",
+      pcFoot: "Toutes ces lignes sont gratuites et confidentielles. Plus d’aide : h3lp.francobernal.ca",
       aboutTitle: "À propos de h3lp",
-      about: "h3lp est un point de repère gratuit pour l'Ontario, créé par Franco Bernal. Nous n'exploitons aucun de ces services. Nous vous dirigeons vers des organismes de confiance, ontariens et pancanadiens, pour que vous rejoigniez l'aide réelle directement. Chaque numéro a été vérifié à la main; confirmez les détails locaux en appelant le 211.",
+      about: "h3lp est un point de repère gratuit pour l’Ontario, créé par Franco Bernal. Nous n’exploitons aucun de ces services. Nous vous dirigeons vers des organismes de confiance, ontariens et pancanadiens, pour que vous rejoigniez l’aide réelle directement. Chaque numéro a été vérifié à la main; confirmez les détails locaux en appelant le 211.",
       privacyTitle: "Confidentialité",
-      privacy: "Aucun compte, aucun témoin, aucun traçage. Ce que vous écrivez reste sur cet appareil. Si vous choisissez une ville, h3lp demande à Open-Meteo la prévision météo de cette ville; rien à votre sujet n'est envoyé. Après votre première visite, h3lp fonctionne sans connexion.",
+      privacy: "Aucun compte, aucun témoin, aucun traçage. Ce que vous écrivez reste sur cet appareil. Si vous choisissez une ville, h3lp demande à Open-Meteo la prévision météo de cette ville; rien à votre sujet n’est envoyé. Après votre première visite, h3lp fonctionne sans connexion.",
       report: "Signaler un lien brisé", reportSub: "Ouvre votre application courriel.",
       reportSubject: "h3lp : un lien ou un numéro à corriger",
       sky: "La fine ligne en haut de la page suit le ciel de Toronto en ce moment.",
       sunrise: "Prochain lever du soleil : {t}.",
       danger: "En danger immédiat? Composez le 911.",
-      quote: "« La raison reste à l'épreuve des balles, même écrite en code. »",
+      quote: "« La raison reste à l’épreuve des balles, même écrite en code. »",
       madeby: "Fait par un civil, pour tous les civils",
       cred: "© 2026 Franco Bernal · Gratuit pour toujours · Fièrement conçu en Ontario, au Canada",
       here: "partout en Ontario", hereCity: "à {city}", hereAll: "partout en Ontario", hereAllCity: "y compris à {city}",
-      nfTitle: "Cette page n'existe pas.",
-      nfBody: "Le lien est peut-être périmé, ou l'adresse légèrement erronée.",
-      nfHelp: "Besoin d'aide maintenant? Appelez ou textez le 988, à toute heure. Si quelqu'un est en danger, composez le 911. Pour tout le reste, appelez le 211.",
+      facts: { checked: "Chaque numéro vérifié à la main, juillet 2026", lang: "Français et anglais", offline: "Fonctionne hors ligne après votre première visite" },
+      nfTitle: "Cette page n’existe pas.",
+      nfBody: "Le lien est peut-être périmé, ou l’adresse légèrement erronée.",
+      nfHelp: "Besoin d’aide maintenant? Appelez ou textez le 988, à toute heure. Si quelqu’un est en danger, composez le 911. Pour tout le reste, appelez le 211.",
       nfHome: "Retour à h3lp",
       nsLead: "La recherche et les outils ont besoin de JavaScript, qui est désactivé. Ces lignes gratuites fonctionnent en tout temps :",
       ns211: "Liste complète des services locaux : 211ontario.ca/fr"

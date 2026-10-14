@@ -1,57 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
-<title>Page not found &middot; h3lp</title>
-<style>
-  :root {
-    color-scheme: light dark;
-    --bg: #f7f7f5; --fg: #14140f; --muted: #6b6b63; --line: rgba(0,0,0,.12);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0a0a0c; --fg: #ededf0; --muted: #8a8a93; --line: rgba(255,255,255,.14); }
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
-  body {
-    background: var(--bg); color: var(--fg);
-    font: 400 16px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    display: flex; align-items: center; justify-content: center;
-    padding: 32px;
-  }
-  main { max-width: 34rem; }
-  .code {
-    font-variant-numeric: tabular-nums; letter-spacing: .18em;
-    font-size: .78rem; text-transform: uppercase; color: var(--muted);
-    margin: 0 0 1.25rem;
-  }
-  h1 {
-    font-size: clamp(1.9rem, 6vw, 2.9rem); line-height: 1.12;
-    font-weight: 500; letter-spacing: -0.02em; margin: 0 0 .9rem;
-  }
-  p { color: var(--muted); margin: 0 0 2rem; }
-  a.home {
-    display: inline-block; color: inherit; text-decoration: none;
-    border: 1px solid var(--line); border-radius: 100px;
-    padding: .7rem 1.4rem; font-size: .92rem;
-    transition: border-color .25s ease, transform .25s ease;
-  }
-  a.home:hover, a.home:focus-visible { border-color: currentColor; transform: translateY(-1px); }
-  a.home:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-  .site { margin-top: 2.5rem; font-size: .8rem; color: var(--muted); letter-spacing: .04em; }
-  @media (prefers-reduced-motion: reduce) { a.home { transition: none; } }
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="color-scheme" content="light dark" />
+<title>Page not found · h3lp</title>
+<link rel="icon" href="/assets/img/favicon-48-v1.png" type="image/png" sizes="48x48" />
+<link rel="stylesheet" href="/site.css" />
 </head>
-<body>
-<main>
-  <p class="code">Error 404</p>
-  <h1>This page doesn&rsquo;t exist.</h1>
-  <p>The link may be out of date, or the address slightly off.</p>
-  <a class="home" href="/">Back to h3lp</a>
-  <p class="site">h3lp</p>
+<body class="nf">
+<div class="strip" role="region" aria-label="Emergency lines">
+  <div class="horizon" aria-hidden="true"></div>
+  <div class="strip-row">
+    <p class="strip-note">Thinking of suicide, or someone in danger?</p>
+    <a class="sbtn sbtn-solid" href="tel:988" aria-label="Call 988, the suicide crisis helpline">988</a>
+    <a class="sbtn sbtn-solid" href="sms:988" aria-label="Text 988, the suicide crisis helpline">Text 988</a>
+    <a class="sbtn sbtn-line" href="tel:911" aria-label="Call 911, emergency">911</a>
+    <a class="sbtn sbtn-exit" href="https://www.theweathernetwork.com/ca" rel="nofollow noreferrer" aria-label="Quick exit: leave this site and open the weather">Exit</a>
+  </div>
+</div>
+<main class="wrap nf-main">
+  <p class="eyebrow">Error 404</p>
+  <h1>This page doesn’t exist.</h1>
+  <p class="lede">The link may be out of date, or the address slightly off.</p>
+  <p>Need help now? Call or text <a href="tel:988">988</a>, any hour. If someone is in danger, call <a href="tel:911">911</a>. For anything else, call <a href="tel:211">211</a>.</p>
+  <div lang="fr-CA">
+    <h2 class="h-sm">Cette page n’existe pas.</h2>
+    <p>Le lien est peut-être périmé, ou l’adresse légèrement erronée.</p>
+    <p>Besoin d’aide maintenant? Appelez ou textez le <a href="tel:988">988</a>, à toute heure. Si quelqu’un est en danger, composez le <a href="tel:911">911</a>. Pour tout le reste, appelez le <a href="tel:211">211</a>.</p>
+  </div>
+  <p class="row"><a class="btn btn-primary" href="/">Back to h3lp</a><a class="btn btn-quiet" href="/#fr" lang="fr-CA">Retour à h3lp</a></p>
 </main>
 </body>
 </html>

@@ -1,294 +1,124 @@
-/* h3lp — hub logic. Mobile-first. Bilingual EN/FR.
-   - Crafted intro: the uploaded video plays, then transitions into the site.
-   - City filter that visibly changes things: local help first, province-wide lines
-     confirmed "available in <city>", a live count, and a city-aware heading.
-   - Verified, inclusive Ontario/Canada resources (no invented numbers).
-   - Full French layer: FR org names and FR links only where the organization's own
-     French branding/page was verified. Language lives in the URL hash (#fr/...),
-     never in storage — the "stores nothing" promise holds. */
+/* h3lp page logic. Mobile first, bilingual EN/FR, works offline after the first visit.
+   Nothing about the visitor is stored or sent. The one exception is opt-in: the safety
+   plan can be kept in this browser, and only when the person chooses it.
+   The weather check asks Open-Meteo for a city's forecast (fixed city coordinates). */
 (function () {
   "use strict";
+  var D = window.H3lpData, I = window.H3lpIntent, SKY = window.H3lpSky;
+  if (!D) return;
 
-  /* ---------- Category colours (from the logo spectrum) ---------- */
-  var COLOR = { talk: "#0c7d92", food: "#e0701f", safe: "#d65745", comm: "#5f9136", play: "#1f8aa6", "new": "#cf9626", money: "#2f8f6f", all: "#0c6b80" };
+  var EXIT_URL = "https://www.theweathernetwork.com/ca";
+  var PLAN_KEY = "h3lp.safetyplan.v1";
+  var BY_ID = {};
+  D.R.forEach(function (r) { BY_ID[r.id] = r; });
+  var TAB = {};
+  D.TABS.forEach(function (t) { TAB[t.id] = t; });
+  var CITY = {};
+  D.CITIES.forEach(function (c) { CITY[c.slug] = c; });
 
-  var TABS = [
-    { id: "talk",  label: "Talk to someone",       labelFr: "Parler à quelqu'un",            icon: "💬", title: "Someone to talk to",        titleFr: "Quelqu'un à qui parler",              note: "Free · confidential · most 24/7",      noteFr: "Gratuit · confidentiel · souvent 24/7" },
-    { id: "food",  label: "Food today",            labelFr: "Manger aujourd'hui",            icon: "🍲", title: "A meal today",               titleFr: "Un repas aujourd'hui",                note: "No one should go to sleep hungry.",    noteFr: "Personne ne devrait s'endormir le ventre vide." },
-    { id: "safe",  label: "A safe place",          labelFr: "Un endroit sûr",                icon: "🛡️", title: "If you're not safe",         titleFr: "Si vous n'êtes pas en sécurité",      note: "It's not your fault. You have options.", noteFr: "Ce n'est pas votre faute. Vous avez des options." },
-    { id: "comm",  label: "Community",             labelFr: "Communauté",                    icon: "🤝", title: "Community to belong to",     titleFr: "Une communauté où trouver sa place",  note: "A safe place to show up.",             noteFr: "Un endroit accueillant, sans jugement." },
-    { id: "play",  label: "Sports for youth",      labelFr: "Sports pour les jeunes",        icon: "⚽", title: "Get a kid into sport",       titleFr: "Inscrire un enfant au sport",         note: "Cost shouldn't keep them out.",        noteFr: "Le coût ne devrait pas les en priver." },
-    { id: "new",   label: "New to Canada & legal", labelFr: "Nouveau au Canada et juridique", icon: "🍁", title: "New to Canada & legal help", titleFr: "Nouveaux arrivants et aide juridique", note: "You are not alone here.",             noteFr: "Vous n'êtes pas seul(e) ici." },
-    { id: "money", label: "Money basics",          labelFr: "L'argent, les bases",           icon: "💵", title: "A first step with money",    titleFr: "Un premier pas avec l'argent",        note: "Free, trustworthy, nothing to buy.",   noteFr: "Gratuit, fiable, rien à acheter." },
-    { id: "all",   label: "Not sure",              labelFr: "Je ne sais pas trop",           icon: "🧭", title: "Not sure where to start?",   titleFr: "Vous ne savez pas par où commencer?", note: "One call covers almost anything.",     noteFr: "Un seul appel couvre presque tout." }
-  ];
+  var state = { lang: "en", city: "", view: null, q: "" };
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  /* ---------- Cities → region (regions with a curated local card) ---------- */
-  var ALL = "All of Ontario";
-  var CITIES = [ALL, "Toronto", "Ottawa", "Mississauga", "Brampton", "Hamilton", "London", "Markham", "Vaughan", "Richmond Hill", "Scarborough", "Oshawa", "Kitchener", "Waterloo", "Cambridge", "Windsor", "Kingston", "Greater Sudbury", "Thunder Bay", "Barrie", "Guelph", "St. Catharines", "Niagara Falls", "Oakville", "Burlington", "North Bay", "Sault Ste. Marie", "Peterborough"];
-  var REGION = { "Toronto": "toronto", "Scarborough": "toronto", "Ottawa": "ottawa", "Hamilton": "hamilton", "London": "london", "Kitchener": "waterloo", "Waterloo": "waterloo", "Cambridge": "waterloo", "Kingston": "kingston", "Greater Sudbury": "sudbury", "Thunder Bay": "thunderbay", "Barrie": "barrie", "Guelph": "guelph" };
-  function regionOf(c) { return REGION[c] || "other"; }
-
-  var state = { tab: "talk", city: ALL, lang: "en" };
-
-  /* ---------- Interface strings, both languages ---------- */
-  var STR = {
-    en: {
-      docTitle: "h3lp · free, verified help across Ontario",
-      metaDesc: "h3lp is a free, friendly hub that connects everyone in Ontario to real, verified help: someone to talk to, a meal today, a safe place, community, free youth sports, newcomer and legal support, and money basics. No sign-up. No tracking.",
-      allCity: "All of Ontario",
-      langBtnText: "FR", langBtnLang: "fr", langBtnLabel: "Passer au français",
-      splashLabel: "h3lp intro", urgentLabel: "Emergency",
-      quickExitTitle: "Instantly leave this site and open the weather instead",
-      cityAria: "Choose your Ontario city", tabsAria: "What do you need?", brandAria: "h3lp home",
-      shareAria: "Share this resource", shareSuffix: "free, verified help via h3lp",
-      saySummary: "Not sure what to say? Tap for opening lines",
-      sayReassure: "You don’t need the right words. They’re trained to carry the conversation from there.",
-      hrsAlwaysTitle: "Open around the clock", hrsOpenUntil: "Open now &middot; until ", hrsOpens: "Opens ",
-      tagLocal: '<b>Local</b> · confirm hours with 211', tagChecked: "Checked July 2026",
-      scope: { on: "Anywhere in Ontario", ca: "Across Canada", finder: "Search for one near you" },
-      static: {
-        skip: "Skip to help",
-        crisis: 'In crisis right now? Call or text <a href="tel:988">988</a>, free and open 24/7.',
-        skipbtn: 'Skip <span aria-hidden="true">→</span>',
-        urgent: 'Thinking of suicide, or in an emergency? Call or text <a href="tel:988">988</a> (free, 24/7). If someone is in danger right now, call <a href="tel:911">911</a>.',
-        quickExit: "Quick exit",
-        brandsub: "a hub for hope &amp; recovery",
-        h1: 'You don\'t have to figure this out <span class="grad">alone</span>.',
-        heroP: "h3lp is a friendly, free hub that connects you to real, verified help across Ontario. Whoever you are and whatever you're going through, there's something here for you. No sign-up, no judgement.",
-        incl: 'Free and open to everyone, any age or background <span class="maple" aria-hidden="true">🍁</span>',
-        whereq: "Where are you?",
-        disc1: "<strong>About these links.</strong> h3lp is a free, non-profit signpost for Ontario. We don't run any of these services. We point you to trusted Ontario and Canada-wide organizations so you can reach the real help directly. The province-wide lines (988, 211, 811, Kids Help Phone) work from any city. Local listings were checked when this page was built; if you spot a broken link, please tell us, and confirm any local detail by calling 211.",
-        disc2: "<strong>In immediate danger? Call 911.</strong> This site sets no cookies, loads no trackers, and stores nothing about you. After your first visit it keeps working even without a connection.",
-        printBtn: "Print the key numbers &middot; wallet card",
-        quote: '"Reason remains bulletproof, even when written in code."',
-        madeby: 'Made by a civilian, for all civilians <span class="maple" aria-hidden="true">🍁</span>',
-        cred: '<div class="nm">h3lp</div>© 2026 Franco Bernal · Free forever<br />Proudly built in Ontario, Canada',
-        pcSub: "free, verified help in Ontario &middot; keep this card",
-        pc988: "Suicide crisis line, call or text, 24/7",
-        pc911: "Someone is in danger right now",
-        pc211: "Any help: food, shelter, money, anything, 24/7",
-        pc811: "A registered nurse, free, 24/7",
-        pcKids: "Kids Help Phone (or text CONNECT to 686868), 24/7",
-        pcConnex: "ConnexOntario: addiction &amp; mental health, 24/7",
-        pcAWHL: "Assaulted Women's Helpline, 24/7",
-        pcSSL: "Seniors Safety Line, 24/7",
-        pcFoot: "All lines are free and confidential. More at the h3lp hub online."
-      },
-      hintAll: function (n) { return "<b>" + n + "</b> services in this list. Your city changes the food listings; phone lines work anywhere in Ontario."; },
-      hintCity: function (n, c) { return "<b>" + n + "</b> services in this list for <b>" + esc(c) + "</b>. Local food help comes first; phone lines work anywhere in Ontario."; },
-      tagIn: function (c) { return "<b>In " + esc(c) + "</b>"; }
-    },
-    fr: {
-      docTitle: "h3lp · de l'aide gratuite et vérifiée, partout en Ontario",
-      metaDesc: "h3lp est un carrefour gratuit et convivial qui relie tout le monde en Ontario à de l'aide réelle et vérifiée : quelqu'un à qui parler, un repas aujourd'hui, un endroit sûr, une communauté, du sport gratuit pour les jeunes, du soutien aux nouveaux arrivants, de l'aide juridique et les bases de l'argent. Sans inscription. Sans traçage.",
-      allCity: "Tout l'Ontario",
-      langBtnText: "EN", langBtnLang: "en", langBtnLabel: "Switch to English",
-      splashLabel: "intro h3lp", urgentLabel: "Urgence",
-      quickExitTitle: "Quitter instantanément ce site et ouvrir la météo à la place",
-      cityAria: "Choisissez votre ville en Ontario", tabsAria: "De quoi avez-vous besoin?", brandAria: "accueil h3lp",
-      shareAria: "Partager cette ressource", shareSuffix: "aide gratuite et vérifiée via h3lp",
-      saySummary: "Vous ne savez pas quoi dire? Touchez pour des phrases d'ouverture",
-      sayReassure: "Vous n’avez pas besoin des mots parfaits. Ces personnes sont formées pour porter la conversation à partir de là.",
-      hrsAlwaysTitle: "Ouvert en tout temps", hrsOpenUntil: "Ouvert &middot; jusqu'à ", hrsOpens: "Ouvre à ",
-      tagLocal: '<b>Local</b> · confirmez les heures au 211', tagChecked: "Vérifié en juillet 2026",
-      scope: { on: "Partout en Ontario", ca: "Partout au Canada", finder: "Cherchez le plus proche" },
-      static: {
-        skip: "Aller à l'aide",
-        crisis: 'En crise en ce moment? Appelez ou textez le <a href="tel:988">988</a>, gratuit, 24/7.',
-        skipbtn: 'Passer <span aria-hidden="true">→</span>',
-        urgent: 'Vous pensez au suicide, ou c\'est une urgence? Appelez ou textez le <a href="tel:988">988</a> (gratuit, 24/7). Si quelqu\'un est en danger immédiat, composez le <a href="tel:911">911</a>.',
-        quickExit: "Sortie rapide",
-        brandsub: "un carrefour d'espoir et de rétablissement",
-        h1: 'Vous n\'avez pas à traverser ça <span class="grad">seul(e)</span>.',
-        heroP: "h3lp est un carrefour convivial et gratuit qui vous relie à de l'aide réelle et vérifiée, partout en Ontario. Qui que vous soyez, quoi que vous traversiez, il y a quelque chose ici pour vous. Sans inscription, sans jugement.",
-        incl: 'Gratuit et ouvert à tout le monde, peu importe l\'âge ou le parcours <span class="maple" aria-hidden="true">🍁</span>',
-        whereq: "Où êtes-vous?",
-        disc1: "<strong>À propos de ces liens.</strong> h3lp est un point de repère gratuit et sans but lucratif pour l'Ontario. Nous n'exploitons aucun de ces services. Nous vous dirigeons vers des organismes de confiance, ontariens et pancanadiens, pour que vous rejoigniez l'aide réelle directement. Les lignes provinciales (988, 211, 811, Jeunesse, J'écoute) fonctionnent depuis n'importe quelle ville. Les ressources locales ont été vérifiées au moment de bâtir cette page; si vous voyez un lien brisé, dites-le-nous, et confirmez tout détail local en appelant le 211.",
-        disc2: "<strong>En danger immédiat? Composez le 911.</strong> Ce site n'installe aucun témoin (cookie), ne charge aucun traqueur et ne conserve rien à votre sujet. Après votre première visite, il continue de fonctionner même sans connexion.",
-        printBtn: "Imprimer les numéros clés &middot; carte format portefeuille",
-        quote: "« La raison reste à l'épreuve des balles, même écrite en code. »",
-        madeby: 'Fait par un civil, pour tous les civils <span class="maple" aria-hidden="true">🍁</span>',
-        cred: '<div class="nm">h3lp</div>© 2026 Franco Bernal · Gratuit pour toujours<br />Fièrement conçu en Ontario, au Canada',
-        pcSub: "de l'aide gratuite et vérifiée en Ontario &middot; gardez cette carte",
-        pc988: "Ligne de crise suicide, appel ou texto, 24/7",
-        pc911: "Quelqu'un est en danger en ce moment",
-        pc211: "Toute aide : nourriture, refuge, argent, tout, 24/7",
-        pc811: "Une infirmière autorisée, gratuit, 24/7",
-        pcKids: "Jeunesse, J'écoute (ou textez PARLER au 686868), 24/7",
-        pcConnex: "ConnexOntario : dépendances et santé mentale, 24/7",
-        pcAWHL: "Assaulted Women's Helpline (violence conjugale), 24/7",
-        pcSSL: "Ligne d'assistance aux personnes âgées, 24/7",
-        pcFoot: "Toutes ces lignes sont gratuites et confidentielles. Plus de ressources sur le site h3lp."
-      },
-      hintAll: function (n) { return "<b>" + n + "</b> services dans cette liste. Votre ville change les ressources alimentaires; les lignes téléphoniques fonctionnent partout en Ontario."; },
-      hintCity: function (n, c) { return "<b>" + n + "</b> services dans cette liste pour <b>" + esc(c) + "</b>. L'aide alimentaire locale passe en premier; les lignes téléphoniques fonctionnent partout en Ontario."; },
-      tagIn: function (c) { return "<b>À " + esc(c) + "</b>"; }
-    }
-  };
-  function S(k) { return STR[state.lang][k]; }
-
-  function here(c) {
-    if (state.lang === "fr") return c === ALL ? "partout en Ontario" : 'à <span class="here">' + c + "</span>";
-    return c === ALL ? "across Ontario" : 'in <span class="here">' + c + "</span>";
+  /* ---------- small helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function S(path) {
+    var o = D.STR[state.lang];
+    path.split(".").forEach(function (k) { o = o == null ? o : o[k]; });
+    return o;
   }
-  var INTRO = {
-    en: {
-      talk: function (c) { return "Whatever you're carrying, whether it's drugs, drinking, panic, grief, or just feeling like there's no way out, trained responders are ready to listen. Free, confidential crisis lines and support services are available 24/7 " + here(c) + ". There are options for everyone, plus dedicated lines built for youth, Indigenous, Black, 2SLGBTQ+, Muslim, and student communities. Start here."; },
-      food: function (c) { return "Free food banks and meal programs " + here(c) + ". Most don't ask for ID or a reason. Pick your city and your nearest option comes first."; },
-      safe: function (c) { return "If someone is hurting you, scaring you, or controlling you, these lines are private and free " + here(c) + ". They help you understand your choices and find a safe place, without ever forcing you into anything. Need to leave fast? The <b>Quick exit</b> button up top instantly swaps this page for the weather."; },
-      comm: function (c) { return "Recovery and a fresh start are easier around people. Drop-in centres, youth hubs, recovery and faith groups. A healthy way to fill the time and belong, " + here(c) + "."; },
-      play: function (c) { return "Sport keeps kids and teens busy, connected, and well. These help families " + here(c) + " cover registration and gear, even when money is tight."; },
-      "new": function (c) { return "Arriving somewhere new and not knowing what exists is its own kind of hard. Ontario has free settlement workers and free legal help, for jobs, language, housing, benefits, and your rights. Start here, " + here(c) + "."; },
-      money: function () { return "Money stress makes everything harder. These are free Government of Canada tools, with no selling and no catch. Start with one small thing."; },
-      all: function (c) { return "If your situation doesn't fit a box, start here. One free call connects you to a real person who can point you to food, housing, health, money, and more, " + (c === ALL ? "anywhere in Ontario" : "including " + c) + "."; }
-    },
-    fr: {
-      talk: function (c) { return "Peu importe ce que vous portez, que ce soit la drogue, l'alcool, la panique, le deuil, ou juste l'impression qu'il n'y a pas d'issue, des intervenants formés sont prêts à écouter. Des lignes de crise et des services de soutien gratuits et confidentiels sont offerts 24/7 " + here(c) + ". Il y a des options pour tout le monde, avec des lignes dédiées pour les jeunes et pour les communautés autochtones, noires, 2SLGBTQ+, musulmanes et étudiantes. Commencez ici."; },
-      food: function (c) { return "Des banques alimentaires et des programmes de repas gratuits " + here(c) + ". La plupart ne demandent ni pièce d'identité ni justification. Choisissez votre ville et l'option la plus proche s'affiche en premier."; },
-      safe: function (c) { return "Si quelqu'un vous fait du mal, vous fait peur ou vous contrôle, ces lignes sont privées et gratuites " + here(c) + ". Elles vous aident à comprendre vos choix et à trouver un endroit sûr, sans jamais rien vous imposer. Besoin de partir vite? Le bouton <b>Sortie rapide</b> en haut remplace instantanément cette page par la météo."; },
-      comm: function (c) { return "Le rétablissement et un nouveau départ sont plus faciles quand on est bien entouré. Centres d'accueil, carrefours jeunesse, groupes de rétablissement et communautés de foi. Une façon saine d'occuper le temps et de trouver sa place, " + here(c) + "."; },
-      play: function (c) { return "Le sport garde les enfants et les ados occupés, connectés et en santé. Ces programmes aident les familles " + here(c) + " à couvrir l'inscription et l'équipement, même quand l'argent est serré."; },
-      "new": function (c) { return "Arriver quelque part sans savoir ce qui existe, c'est déjà difficile en soi. L'Ontario offre gratuitement des travailleurs d'établissement et de l'aide juridique : emploi, langue, logement, prestations et vos droits. Commencez ici, " + here(c) + "."; },
-      money: function () { return "Le stress financier rend tout plus difficile. Voici des outils gratuits du gouvernement du Canada, sans vente et sans piège. Commencez par une petite chose."; },
-      all: function (c) { return "Si votre situation n'entre dans aucune case, commencez ici. Un seul appel gratuit vous met en contact avec une vraie personne qui peut vous orienter : nourriture, logement, santé, argent et plus, " + (c === ALL ? "partout en Ontario" : "y compris à " + c) + "."; }
-    }
-  };
-
-  /* ---------- Resources (region:null = province-wide, always available) ----------
-     fr = the French layer. FR titles only where the org's own French branding was
-     verified (2026-07-16); FR links only where the org's French page was verified live. */
-  var R = [
-    /* TALK */
-    { id: "988", svc: "988", scope: "ca", cats: ["talk", "all"], hot: true, who: "Right now · 24/7", title: "988 Suicide Crisis Helpline", hours: "24/7", body: "If you're thinking about suicide, or worried about someone who is. Call or text 988 any time, free, anywhere in Canada.", actions: [{ label: "Call or text 988", href: "tel:988" }],
-      fr: { who: "Tout de suite · 24/7", title: "9-8-8 : Ligne d'aide en cas de crise de suicide", body: "Si vous pensez au suicide, ou si vous vous inquiétez pour quelqu'un. Appelez ou textez le 988 à toute heure, gratuitement, partout au Canada.", actions: [{ label: "Appelez ou textez le 988", href: "tel:988" }] } },
-    { id: "connex", svc: "connex", scope: "on", cats: ["talk"], who: "Ontario · addiction & mental health", title: "ConnexOntario", hours: "24/7", body: "Free, confidential, government-funded line for drugs, alcohol, gambling, or mental health. They find local treatment for you, even with no insurance. Open 24/7.", actions: [{ label: "Call 1-866-531-2600", href: "tel:18665312600" }, { label: "Website", href: "https://connexontario.ca", alt: true }],
-      fr: { who: "Ontario · dépendances et santé mentale", body: "Une ligne gratuite, confidentielle et financée par le gouvernement pour la drogue, l'alcool, le jeu ou la santé mentale. On trouve un traitement local pour vous, même sans assurance. Ouvert 24/7.", actions: [{ label: "Appelez le 1 866 531-2600", href: "tel:18665312600" }, { label: "Site Web", href: "https://www.connexontario.ca/fr-ca", alt: true }] } },
-    { id: "khp", svc: "khp", scope: "on", cats: ["talk"], who: "Ontario · ages 5–29", title: "Kids Help Phone", hours: "24/7", body: "For kids, teens, and young adults. Call any time, or text CONNECT to 686868. Free, confidential, and they actually get it.", actions: [{ label: "Call 1-800-668-6868", href: "tel:18006686868" }, { label: "Text 686868", href: "sms:686868?body=CONNECT", alt: true }],
-      fr: { who: "Ontario · 5 à 29 ans", title: "Jeunesse, J'écoute", body: "Pour les enfants, les ados et les jeunes adultes. Appelez à toute heure, ou textez PARLER au 686868. Gratuit, confidentiel, et on vous comprend vraiment.", actions: [{ label: "Appelez le 1 800 668-6868", href: "tel:18006686868" }, { label: "Textez PARLER au 686868", href: "sms:686868?body=PARLER", alt: true }] } },
-    { id: "811", svc: "811", scope: "on", cats: ["talk", "all"], who: "Ontario · a nurse, free", title: "Health811", hours: "24/7", body: "Dial 811 to talk to a registered nurse, free, 24/7, about any health worry, including mental health or substance use. No health card needed.", actions: [{ label: "Call 811", href: "tel:811" }, { label: "Website", href: "https://health811.ontario.ca", alt: true }],
-      fr: { who: "Ontario · une infirmière, gratuit", title: "Santé811", body: "Composez le 811 pour parler à une infirmière autorisée, gratuitement, 24/7, pour toute inquiétude de santé, y compris la santé mentale ou la consommation. Aucune carte Santé requise.", actions: [{ label: "Appelez le 811", href: "tel:811" }, { label: "Site Web", href: "https://health811.ontario.ca/static/fr-ca/guest/home", alt: true }] } },
-    { id: "good2talk", svc: "good2talk", scope: "on", cats: ["talk"], who: "Ontario · post-secondary students", title: "Good2Talk", hours: "24/7", body: "Free, confidential, 24/7 support for college and university students in Ontario, in over 100 languages. Call or text.", actions: [{ label: "Call 1-866-925-5454", href: "tel:18669255454" }, { label: "Text GOOD2TALKON to 686868", href: "sms:686868?body=GOOD2TALKON", alt: true }],
-      fr: { who: "Ontario · étudiants postsecondaires", title: "Allo J'écoute", body: "Du soutien gratuit, confidentiel et 24/7 pour les étudiantes et étudiants des collèges et universités de l'Ontario, en plus de 100 langues. Appelez ou textez.", actions: [{ label: "Appelez le 1 866 925-5454", href: "tel:18669255454" }, { label: "Textez ALLOJECOUTEON au 686868", href: "sms:686868?body=ALLOJECOUTEON", alt: true }] } },
-    { id: "hope", svc: "hope", scope: "ca", cats: ["talk"], who: "Indigenous peoples · 24/7", title: "Hope for Wellness Helpline", hours: "24/7", body: "Immediate counselling and crisis support for all First Nations, Inuit, and Métis. Available in English, French, Cree, Ojibway, and Inuktitut.", actions: [{ label: "Call 1-855-242-3310", href: "tel:18552423310" }, { label: "Online chat", href: "https://www.hopeforwellness.ca", alt: true }],
-      fr: { who: "Peuples autochtones · 24/7", title: "Espoir pour le mieux-être", body: "Du counseling immédiat et du soutien de crise pour tous les membres des Premières Nations, les Inuits et les Métis. Offert en français, en anglais, en cri, en ojibwé et en inuktitut.", actions: [{ label: "Appelez le 1 855 242-3310", href: "tel:18552423310" }, { label: "Clavardage en ligne", href: "https://www.espoirpourlemieuxetre.ca", alt: true }] } },
-    { id: "mno", svc: "mno", scope: "on", cats: ["talk"], who: "Indigenous · Ontario · 24/7", title: "Métis Nation of Ontario crisis line", hours: "24/7", body: "A 24-hour mental health and addictions crisis line with culturally specific support for Métis adults, youth, and families, in English and French.", actions: [{ label: "Call 1-877-767-7572", href: "tel:18777677572" }],
-      fr: { who: "Autochtones · Ontario · 24/7", title: "Ligne de crise de la Métis Nation of Ontario", body: "Une ligne de crise en santé mentale et en dépendances, 24 heures sur 24, avec un soutien culturellement adapté pour les adultes, les jeunes et les familles métis, en français et en anglais.", actions: [{ label: "Appelez le 1 877 767-7572", href: "tel:18777677572" }] } },
-    { id: "byh", svc: "byh", scope: "on", cats: ["talk"], who: "Black youth & families", title: "Black Youth Helpline", hours: { days: [0,1,2,3,4,5,6], from: 540, to: 1320, label: "every day", labelFr: "tous les jours" }, body: "A culturally safe, professional helpline for Black youth, families, and schools across Ontario. Open every day, 9am–10pm.", actions: [{ label: "Call 1-833-294-8650", href: "tel:18332948650" }, { label: "Website", href: "https://blackyouth.ca", alt: true }],
-      fr: { who: "Jeunes noirs et familles", body: "Une ligne d'aide professionnelle et culturellement sécuritaire pour les jeunes noirs, les familles et les écoles, partout en Ontario. Ouvert tous les jours, de 9 h à 22 h.", actions: [{ label: "Appelez le 1 833 294-8650", href: "tel:18332948650" }, { label: "Site Web", href: "https://blackyouth.ca", alt: true }] } },
-    { id: "youthline", svc: "youthline", scope: "on", cats: ["talk"], who: "2SLGBTQ+ youth · 29 & under", title: "LGBT YouthLine", hours: { days: [0,1,2,3,4,5], from: 960, to: 1290, label: "Sun–Fri", labelFr: "dim–ven" }, body: "Confidential, non-judgemental peer support by and for 2SLGBTQ+ youth across Ontario, by text or online chat.", actions: [{ label: "Text 647-694-4275", href: "sms:16476944275" }, { label: "Online chat", href: "https://www.youthline.ca/", alt: true }],
-      fr: { who: "Jeunes 2SLGBTQ+ · 29 ans et moins", body: "Du soutien par les pairs, confidentiel et sans jugement, par et pour les jeunes 2SLGBTQ+ de l'Ontario, par texto ou par clavardage en ligne.", actions: [{ label: "Textez le 647 694-4275", href: "sms:16476944275" }, { label: "Clavardage en ligne", href: "https://www.youthline.ca/", alt: true }] } },
-    { id: "naseeha", svc: "naseeha", cats: ["talk"], who: "Muslim mental health", title: "Naseeha", body: "Confidential, culturally and spiritually aware support for Muslim youth and anyone who needs it: mental health, faith, family, and more.", actions: [{ label: "Call 1-866-627-3342", href: "tel:18666273342" }, { label: "Website", href: "https://naseeha.org", alt: true }],
-      fr: { who: "Santé mentale musulmane", body: "Un soutien confidentiel, adapté à la culture et à la spiritualité, pour les jeunes musulmans et toute personne qui en a besoin : santé mentale, foi, famille et plus.", actions: [{ label: "Appelez le 1 866 627-3342", href: "tel:18666273342" }, { label: "Site Web", href: "https://naseeha.org", alt: true }] } },
-    { id: "cssp", svc: "cssp", cats: ["talk", "comm", "new"], region: "toronto", regionLabel: "Toronto", local: true, who: "Spanish-speaking · Toronto", title: "Centre for Spanish Speaking Peoples", body: "A trusted Toronto non-profit serving Spanish-speaking communities since 1973: counselling, support for women facing abuse, youth and seniors programs, settlement help, and a free legal clinic. En español.", actions: [{ label: "Call 416-533-8545", href: "tel:14165338545" }, { label: "Website", href: "https://spanishservices.org/en/", alt: true }],
-      fr: { who: "Hispanophones · Toronto", body: "Un organisme torontois de confiance au service des communautés hispanophones depuis 1973 : counseling, soutien aux femmes qui subissent de la violence, programmes pour jeunes et aînés, aide à l'établissement et clinique juridique gratuite. En español.", actions: [{ label: "Appelez le 416 533-8545", href: "tel:14165338545" }, { label: "Site Web", href: "https://spanishservices.org/en/", alt: true }] } },
-    { id: "dco", svc: "dco", scope: "finder", cats: ["talk"], who: "Ontario · local distress centres", title: "Distress & Crisis Ontario", body: "A network of community distress centres across Ontario, a listening ear for anyone feeling lonely, low, or in crisis, often 24/7.", actions: [{ label: "Find a centre", href: "https://www.dcontario.org" }],
-      fr: { who: "Ontario · centres de détresse locaux", body: "Un réseau de centres de détresse communautaires partout en Ontario. Une oreille attentive pour toute personne qui se sent seule, à plat ou en crise, souvent 24/7.", actions: [{ label: "Trouver un centre", href: "https://www.dcontario.org" }] } },
-
-    /* FOOD — province-wide */
-    { id: "feedon", svc: "feedon", scope: "finder", cats: ["food"], who: "All of Ontario", title: "Find a food bank (Feed Ontario)", body: "Ontario's food bank network. Type your town and it lists the nearest member food bank with its address and contact.", actions: [{ label: "Find food", href: "https://feedontario.ca/find-a-food-bank/" }],
-      fr: { who: "Tout l'Ontario", title: "Trouver une banque alimentaire (Feed Ontario)", body: "Le réseau des banques alimentaires de l'Ontario. Entrez votre ville et l'outil affiche la banque alimentaire membre la plus proche, avec son adresse et son contact.", actions: [{ label: "Trouver de la nourriture", href: "https://feedontario.ca/find-a-food-bank/" }] } },
-    { id: "211food", svc: "211", scope: "on", cats: ["food", "all"], who: "Anywhere in Ontario · 24/7", title: "Call 211 for food", hours: "24/7", body: "Dial 211 and a real person finds food banks, free meals, and meal programs near you, with hours and whether you need to book. Many languages.", actions: [{ label: "Call 211", href: "tel:211" }, { label: "Search online", href: "https://211ontario.ca", alt: true }],
-      fr: { who: "Partout en Ontario · 24/7", title: "Appelez le 211 pour manger", body: "Composez le 211 et une vraie personne trouve pour vous les banques alimentaires, les repas gratuits et les programmes alimentaires près de chez vous, avec les heures et s'il faut réserver. Plusieurs langues.", actions: [{ label: "Appelez le 211", href: "tel:211" }, { label: "Chercher en ligne", href: "https://211ontario.ca/fr/", alt: true }] } },
-    /* FOOD — local */
-    { id: "dailybread", svc: "dailybread", cats: ["food"], region: "toronto", regionLabel: "Toronto", local: true, who: "Toronto", title: "Daily Bread Food Bank", hours: { days: [1,2,3,4,5], from: 510, to: 990, label: "Mon–Fri", labelFr: "lun–ven" }, body: "Over 100 member food banks across Toronto. No ID required for a single person. Use their finder or call to locate your nearest one.", actions: [{ label: "Find food", href: "https://www.dailybread.ca/" }, { label: "Call 416-203-0050", href: "tel:14162030050", alt: true }],
-      fr: { who: "Toronto", body: "Plus de 100 banques alimentaires membres à Toronto. Aucune pièce d'identité requise pour une personne seule. Utilisez leur outil de recherche ou appelez pour trouver la plus proche.", actions: [{ label: "Trouver de la nourriture", href: "https://www.dailybread.ca/" }, { label: "Appelez le 416 203-0050", href: "tel:14162030050", alt: true }] } },
-    { id: "ottawafb", svc: "ottawafb", cats: ["food"], region: "ottawa", regionLabel: "Ottawa", local: true, who: "Ottawa", title: "Ottawa Food Bank", body: "Coordinates food banks and meal programs across Ottawa. Their site finds your nearest neighbourhood food bank and community meal.", actions: [{ label: "Find food", href: "https://www.ottawafoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Ottawa", title: "La Banque d'alimentation d'Ottawa", body: "Coordonne les banques alimentaires et les programmes de repas partout à Ottawa. Leur site trouve la banque alimentaire de quartier et le repas communautaire les plus proches.", actions: [{ label: "Trouver de la nourriture", href: "https://www.ottawafoodbank.ca/fr/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "hamiltonfs", svc: "hamiltonfs", cats: ["food"], region: "hamilton", regionLabel: "Hamilton", local: true, who: "Hamilton", title: "Hamilton Food Share", body: "The hub for Hamilton's emergency food network. Their 'Looking for help' page lists food banks and hot-meal programs across the city.", actions: [{ label: "Find food", href: "https://hamiltonfoodshare.org/looking-for-help" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Hamilton", body: "Le cœur du réseau alimentaire d'urgence de Hamilton. Leur page « Looking for help » liste les banques alimentaires et les repas chauds partout en ville.", actions: [{ label: "Trouver de la nourriture", href: "https://hamiltonfoodshare.org/looking-for-help" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "londonfb", svc: "londonfb", cats: ["food"], region: "london", regionLabel: "London", local: true, who: "London", title: "London Food Bank", body: "Serving London and Middlesex. They point you to the nearest food bank or community meal, with no need to explain why.", actions: [{ label: "Find food", href: "https://londonfoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "London", body: "Au service de London et du comté de Middlesex. On vous dirige vers la banque alimentaire ou le repas communautaire le plus proche, sans avoir à vous justifier.", actions: [{ label: "Trouver de la nourriture", href: "https://londonfoodbank.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "waterloofb", svc: "waterloofb", cats: ["food"], region: "waterloo", regionLabel: "Kitchener · Waterloo · Cambridge", local: true, who: "Waterloo Region", title: "The Food Bank of Waterloo Region", body: "Connects you to food banks and community programs across Kitchener, Waterloo and Cambridge.", actions: [{ label: "Find food", href: "https://www.thefoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Région de Waterloo", body: "Vous met en lien avec les banques alimentaires et les programmes communautaires de Kitchener, Waterloo et Cambridge.", actions: [{ label: "Trouver de la nourriture", href: "https://www.thefoodbank.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "kingstonfb", svc: "kingstonfb", cats: ["food"], region: "kingston", regionLabel: "Kingston", local: true, who: "Kingston", title: "Partners in Mission Food Bank", body: "Kingston's central food bank, supplying neighbourhood programs across the city. Find help or call 211 to confirm hours.", actions: [{ label: "Find food", href: "https://www.kingstonfoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Kingston", body: "La banque alimentaire centrale de Kingston, qui approvisionne les programmes de quartier partout en ville. Trouvez de l'aide ou appelez le 211 pour confirmer les heures.", actions: [{ label: "Trouver de la nourriture", href: "https://www.kingstonfoodbank.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "sudburyfb", svc: "sudburyfb", cats: ["food"], region: "sudbury", regionLabel: "Greater Sudbury", local: true, who: "Greater Sudbury", title: "Sudbury Food Bank", body: "Supplies emergency food to programs across Greater Sudbury. Their site and 211 find your nearest pickup.", actions: [{ label: "Find food", href: "https://www.sudburyfoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Grand Sudbury", body: "Fournit des aliments d'urgence aux programmes du Grand Sudbury. Leur site et le 211 trouvent le point de service le plus proche.", actions: [{ label: "Trouver de la nourriture", href: "https://www.sudburyfoodbank.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "tbayfb", svc: "tbayfb", cats: ["food"], region: "thunderbay", regionLabel: "Thunder Bay & region", local: true, who: "Thunder Bay", title: "Regional Food Distribution Assoc.", body: "Northwestern Ontario's food network, based in Thunder Bay. Find a food bank or meal program near you.", actions: [{ label: "Find food", href: "https://www.foodbanksnorthwest.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Thunder Bay", regionLabel: "Thunder Bay et la région", body: "Le réseau alimentaire du Nord-Ouest de l'Ontario, basé à Thunder Bay. Trouvez une banque alimentaire ou un programme de repas près de chez vous.", actions: [{ label: "Trouver de la nourriture", href: "https://www.foodbanksnorthwest.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "barriefb", svc: "barriefb", cats: ["food"], region: "barrie", regionLabel: "Barrie", local: true, who: "Barrie", title: "Barrie Food Bank", body: "Serving Barrie and the surrounding area. Check eligibility and hours, or call 211 to confirm before you go.", actions: [{ label: "Find food", href: "https://barriefoodbank.org/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Barrie", body: "Au service de Barrie et des environs. Vérifiez l'admissibilité et les heures, ou appelez le 211 pour confirmer avant de vous déplacer.", actions: [{ label: "Trouver de la nourriture", href: "https://barriefoodbank.org/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-    { id: "guelphfb", svc: "guelphfb", cats: ["food"], region: "guelph", regionLabel: "Guelph", local: true, who: "Guelph", title: "Guelph Food Bank", body: "Guelph's community food bank. Their site lists hours and what to bring; 211 can confirm the nearest option.", actions: [{ label: "Find food", href: "https://guelphfoodbank.ca/" }, { label: "Call 211", href: "tel:211", alt: true }],
-      fr: { who: "Guelph", body: "La banque alimentaire communautaire de Guelph. Leur site indique les heures et quoi apporter; le 211 peut confirmer l'option la plus proche.", actions: [{ label: "Trouver de la nourriture", href: "https://guelphfoodbank.ca/" }, { label: "Appelez le 211", href: "tel:211", alt: true }] } },
-
-    /* SAFE */
-    { id: "khpsafe", svc: "khp", scope: "on", cats: ["safe"], hot: true, who: "Kids & teens · 24/7", title: "Kids Help Phone", hours: "24/7", body: "If you're young and someone at home is hurting you. Call, or text CONNECT to 686868, any time. It listens first.", actions: [{ label: "Call 1-800-668-6868", href: "tel:18006686868" }, { label: "Text 686868", href: "sms:686868?body=CONNECT", alt: true }],
-      fr: { who: "Enfants et ados · 24/7", title: "Jeunesse, J'écoute", body: "Si vous êtes jeune et que quelqu'un à la maison vous fait du mal. Appelez, ou textez PARLER au 686868, à toute heure. Ici, on commence par vous écouter.", actions: [{ label: "Appelez le 1 800 668-6868", href: "tel:18006686868" }, { label: "Textez PARLER au 686868", href: "sms:686868?body=PARLER", alt: true }] } },
-    { id: "awhl", svc: "awhl", scope: "on", cats: ["safe"], who: "Gender-based abuse · 24/7", title: "Assaulted Women's Helpline", hours: "24/7", body: "For anyone facing abuse from a partner or family member. Free, confidential crisis support and shelter referrals, 24/7, in many languages.", actions: [{ label: "Call 1-866-863-0511", href: "tel:18668630511" }, { label: "Website", href: "https://www.awhl.org", alt: true }],
-      fr: { who: "Violence fondée sur le genre · 24/7", body: "Pour toute personne qui subit de la violence d'un partenaire ou d'un membre de la famille. Soutien de crise gratuit et confidentiel et orientation vers des refuges, 24/7, en plusieurs langues.", actions: [{ label: "Appelez le 1 866 863-0511", href: "tel:18668630511" }, { label: "Site Web", href: "https://www.awhl.org", alt: true }] } },
-    { id: "ssl", svc: "ssl", scope: "on", cats: ["safe"], who: "Seniors · elder abuse", title: "Seniors Safety Line", hours: "24/7", body: "Free, confidential support 24/7 for older adults experiencing abuse or neglect, in many languages, with referrals to local help.", actions: [{ label: "Call 1-866-299-1011", href: "tel:18662991011" }],
-      fr: { who: "Aînés · maltraitance", title: "Ligne d'assistance aux personnes âgées", body: "Soutien gratuit et confidentiel, 24/7, pour les personnes aînées qui vivent de la maltraitance ou de la négligence, en plusieurs langues, avec orientation vers de l'aide locale.", actions: [{ label: "Appelez le 1 866 299-1011", href: "tel:18662991011" }] } },
-    { id: "211safe", svc: "211", scope: "on", cats: ["safe", "all"], who: "Find shelter · 24/7", title: "Call 211 for a safe place", hours: "24/7", body: "Dial 211 to be connected to emergency shelter, youth shelters, and local safety support anywhere in Ontario. Free and confidential.", actions: [{ label: "Call 211", href: "tel:211" }, { label: "Search online", href: "https://211ontario.ca", alt: true }],
-      fr: { who: "Trouver un refuge · 24/7", title: "Appelez le 211 pour un endroit sûr", body: "Composez le 211 pour être dirigé vers un hébergement d'urgence, des refuges pour jeunes et du soutien local en matière de sécurité, partout en Ontario. Gratuit et confidentiel.", actions: [{ label: "Appelez le 211", href: "tel:211" }, { label: "Chercher en ligne", href: "https://211ontario.ca/fr/", alt: true }] } },
-
-    /* COMMUNITY */
-    { id: "ymca", svc: "ymca", scope: "finder", cats: ["comm"], who: "All ages · all of Ontario", title: "Find your local YMCA", body: "Swimming, gyms, drop-in sports, youth nights, and adult programs. As a charity, the Y offers financial assistance so cost is rarely a barrier.", actions: [{ label: "Find a Y", href: "https://ymca.ca/en/locations" }],
-      fr: { who: "Tous âges · tout l'Ontario", title: "Trouvez votre YMCA", body: "Natation, gyms, sports libres, soirées jeunesse et programmes pour adultes. Comme organisme de bienfaisance, le Y offre de l'aide financière : le coût est rarement un obstacle.", actions: [{ label: "Trouver un Y", href: "https://ymca.ca/fr/emplacements" }] } },
-    { id: "211comm", svc: "211", scope: "on", cats: ["comm", "all"], who: "Community programs · 24/7", title: "Call 211 for community & faith groups", hours: "24/7", body: "211 lists recreation centres, drop-in groups, faith and cultural communities, and free local programs in your own town.", actions: [{ label: "Call 211", href: "tel:211" }, { label: "Search online", href: "https://211ontario.ca", alt: true }],
-      fr: { who: "Programmes communautaires · 24/7", title: "Le 211 : communauté et groupes de foi", body: "Le 211 répertorie les centres récréatifs, les groupes d'accueil, les communautés de foi et culturelles et les programmes locaux gratuits, dans votre propre ville.", actions: [{ label: "Appelez le 211", href: "tel:211" }, { label: "Chercher en ligne", href: "https://211ontario.ca/fr/", alt: true }] } },
-    { id: "hubs", svc: "hubs", scope: "finder", cats: ["comm"], who: "Youth · ages 12–25", title: "Youth Wellness Hubs Ontario", body: "Free, walk-in spaces for young people with mental health support, activities, and a community to connect with. Find a hub near you.", actions: [{ label: "Find a hub", href: "https://youthhubs.ca/" }],
-      fr: { who: "Jeunes · 12 à 25 ans", title: "Carrefours bien-être pour les jeunes de l'Ontario", body: "Des espaces gratuits et sans rendez-vous pour les jeunes : soutien en santé mentale, activités et une communauté où se retrouver. Trouvez un carrefour près de chez vous.", actions: [{ label: "Trouver un carrefour", href: "https://youthhubs.ca/fr/" }] } },
-    { id: "recovery", svc: "connex", scope: "on", cats: ["comm"], who: "Peer recovery support", title: "Recovery groups near you", hours: "24/7", body: "Want to be around others staying sober? ConnexOntario connects you to free self-help and peer recovery groups for alcohol and drugs, 24/7.", actions: [{ label: "Call 1-866-531-2600", href: "tel:18665312600" }, { label: "Website", href: "https://connexontario.ca", alt: true }],
-      fr: { who: "Soutien par les pairs en rétablissement", title: "Groupes de rétablissement près de chez vous", body: "Envie d'être entouré(e) de gens qui restent sobres? ConnexOntario vous met en contact avec des groupes d'entraide et de rétablissement gratuits pour l'alcool et la drogue, 24/7.", actions: [{ label: "Appelez le 1 866 531-2600", href: "tel:18665312600" }, { label: "Site Web", href: "https://www.connexontario.ca/fr-ca", alt: true }] } },
-    { id: "farmer", svc: "farmer", scope: "on", cats: ["comm"], who: "Farmers & rural Ontario · 24/7", title: "Farmer Wellness Initiative", hours: "24/7", body: "Free, confidential counselling for Ontario farmers and their families, 365 days a year, with counsellors who understand farm life.", actions: [{ label: "Call 1-866-267-6255", href: "tel:18662676255" }],
-      fr: { who: "Agriculteurs et Ontario rural · 24/7", body: "Du counseling gratuit et confidentiel pour les agriculteurs de l'Ontario et leurs familles, 365 jours par année, avec des conseillers qui comprennent la vie agricole.", actions: [{ label: "Appelez le 1 866 267-6255", href: "tel:18662676255" }] } },
-
-    /* SPORTS */
-    { id: "kidsport", svc: "kidsport", scope: "on", cats: ["play"], who: "Can't afford the fees?", title: "KidSport Ontario", body: "Grants of up to $250 a year to cover sport registration for kids 18 and under from families facing money barriers. Apply free online.", actions: [{ label: "Apply", href: "https://kidsportcanada.ca/ontario/" }],
-      fr: { who: "Les frais sont trop élevés?", body: "Des subventions allant jusqu'à 250 $ par année pour couvrir l'inscription sportive des jeunes de 18 ans et moins dont la famille fait face à des obstacles financiers. Demande gratuite en ligne.", actions: [{ label: "Faire une demande", href: "https://kidsportcanada.ca/ontario/" }] } },
-    { id: "jumpstart", svc: "jumpstart", scope: "ca", cats: ["play"], who: "Canada-wide · sport funding", title: "Canadian Tire Jumpstart", body: "Helps kids who can't afford it get into sport, covering registration, equipment, and transport. Also runs free community programs.", actions: [{ label: "Apply", href: "https://jumpstart.canadiantire.ca/" }],
-      fr: { who: "Partout au Canada · financement du sport", title: "Bon départ de Canadian Tire", body: "Aide les enfants qui n'en ont pas les moyens à faire du sport : inscription, équipement et transport. Offre aussi des programmes communautaires gratuits.", actions: [{ label: "Faire une demande", href: "https://jumpstart.canadiantire.ca/fr" }] } },
-    { id: "ymcasport", svc: "ymca", scope: "finder", cats: ["play"], who: "All ages · all of Ontario", title: "YMCA sports & swim", body: "Registered and drop-in sports, swim lessons, and day camps, with financial assistance available. Find your local Y.", actions: [{ label: "Find a Y", href: "https://ymca.ca/en/locations" }],
-      fr: { who: "Tous âges · tout l'Ontario", title: "Sports et natation au YMCA", body: "Sports organisés et libres, cours de natation et camps de jour, avec de l'aide financière disponible. Trouvez votre Y.", actions: [{ label: "Trouver un Y", href: "https://ymca.ca/fr/emplacements" }] } },
-
-    /* NEW & LEGAL */
-    { id: "ircc", svc: "ircc", scope: "finder", cats: ["new"], who: "Free · government-funded", title: "Find free newcomer services", body: "The official Government of Canada finder. Free settlement workers near you help with jobs, language classes, housing, schools, health, and benefits.", actions: [{ label: "Find services", href: "https://ircc.canada.ca/english/newcomers/services/index.asp" }],
-      fr: { who: "Gratuit · financé par le gouvernement", title: "Services gratuits pour nouveaux arrivants", body: "L'outil officiel du gouvernement du Canada. Des travailleurs d'établissement gratuits, près de chez vous, aident pour l'emploi, les cours de langue, le logement, l'école, la santé et les prestations.", actions: [{ label: "Trouver des services", href: "https://ircc.canada.ca/francais/nouveaux/services/index.asp" }] } },
-    { id: "nic", svc: "nic", cats: ["new"], who: "First stop for newcomers", title: "YMCA Newcomer Information Centre", body: "A free, welcoming first stop in Ontario. Get a personal settlement plan and clear answers on work, education, health, and life in Canada.", actions: [{ label: "Open", href: "https://newcomersincanada.ca" }],
-      fr: { who: "Premier arrêt des nouveaux arrivants", body: "Un premier arrêt gratuit et accueillant en Ontario. Recevez un plan d'établissement personnalisé et des réponses claires sur le travail, les études, la santé et la vie au Canada.", actions: [{ label: "Ouvrir", href: "https://newcomersincanada.ca" }] } },
-    { id: "legalaid", svc: "legalaid", scope: "on", cats: ["new"], who: "Free legal help", title: "Legal Aid Ontario", body: "Free or low-cost legal help if you can't afford a lawyer: criminal, family, refugee and immigration, and housing. Facing domestic violence? A free 2-hour consult, no income test.", actions: [{ label: "Call 1-800-668-8258", href: "tel:18006688258" }, { label: "Website", href: "https://www.legalaid.on.ca", alt: true }],
-      fr: { who: "Aide juridique gratuite", title: "Aide juridique Ontario", body: "De l'aide juridique gratuite ou à faible coût si vous ne pouvez pas payer un avocat : criminel, famille, réfugiés et immigration, logement. Vous vivez de la violence familiale? Une consultation gratuite de 2 heures, sans critère de revenu.", actions: [{ label: "Appelez le 1 800 668-8258", href: "tel:18006688258" }, { label: "Site Web", href: "https://www.legalaid.on.ca/fr/", alt: true }] } },
-    { id: "clinics", svc: "clinics", scope: "finder", cats: ["new"], who: "Everyday legal problems", title: "Community legal clinics", body: "Local clinics give free help with the essentials: housing and eviction, ODSP and Ontario Works, employment, and human rights. Find your nearest clinic.", actions: [{ label: "Find a clinic", href: "https://www.legalaid.on.ca/legal-clinics/" }],
-      fr: { who: "Problèmes juridiques du quotidien", title: "Cliniques juridiques communautaires", body: "Des cliniques locales offrent de l'aide gratuite pour l'essentiel : logement et éviction, POSPH et Ontario au travail, emploi et droits de la personne. Trouvez la clinique la plus proche.", actions: [{ label: "Trouver une clinique", href: "https://www.legalaid.on.ca/fr/cliniques-juridiques/" }] } },
-
-    /* MONEY */
-    { id: "budget", svc: "budget", scope: "ca", cats: ["money"], who: "Canada · free tool", title: "Budget Planner (FCAC)", body: "The government's free budget tool. It does the math and shows where your money goes, so you can find room to breathe. No account needed.", actions: [{ label: "Open tool", href: "https://itools-ioutils.fcac-acfc.gc.ca/BP-PB/budget-planner" }],
-      fr: { who: "Canada · outil gratuit", title: "Planificateur budgétaire (ACFC)", body: "L'outil budgétaire gratuit du gouvernement. Il fait le calcul et montre où va votre argent, pour vous redonner un peu d'air. Aucun compte requis.", actions: [{ label: "Ouvrir l'outil", href: "https://itools-ioutils.fcac-acfc.gc.ca/BP-PB/outil-planificateur-budgetaire" }] } },
-    { id: "payday", svc: "payday", scope: "ca", cats: ["money"], who: "Canada · know the trap", title: "The truth about payday loans", body: "Borrowing $100 can cost $14 to $17 in fees, over 300% a year, and it traps you in a cycle. Read the plain facts before you ever sign one.", actions: [{ label: "Read first", href: "https://www.canada.ca/en/financial-consumer-agency/services/loans/payday-loans.html" }],
-      fr: { who: "Canada · connaître le piège", title: "La vérité sur les prêts sur salaire", body: "Emprunter 100 $ peut coûter de 14 $ à 17 $ de frais, soit plus de 300 % par année, et le cycle vous piège. Lisez les faits en langage clair avant d'en signer un.", actions: [{ label: "À lire d'abord", href: "https://www.canada.ca/fr/agence-consommation-matiere-financiere/services/prets/prets-sur-salaire.html" }] } },
-    { id: "basics", svc: "basics", scope: "ca", cats: ["money"], who: "Canada · learn the basics", title: "Money basics, no jargon", body: "Free guides on banking, debt, credit, and saving from the Financial Consumer Agency of Canada. Plain language, nothing to buy.", actions: [{ label: "Learn", href: "https://www.canada.ca/en/financial-consumer-agency/services/financial-toolkit.html" }],
-      fr: { who: "Canada · apprendre les bases", title: "Les bases de l'argent, sans jargon", body: "Des guides gratuits sur le compte de banque, les dettes, le crédit et l'épargne, par l'Agence de la consommation en matière financière du Canada. Langage simple, rien à acheter.", actions: [{ label: "Apprendre", href: "https://www.canada.ca/fr/agence-consommation-matiere-financiere/services/vos-outils-financiers.html" }] } },
-
-    /* ALL */
-    { id: "211", svc: "211", scope: "on", cats: ["all"], hot: true, who: "All of Ontario · 24/7", title: "Call 211 Ontario", hours: "24/7", body: "Dial 2-1-1 from any phone, free, any hour. They listen and connect you to local help for whatever you're facing. Over 150 languages.", actions: [{ label: "Call 211", href: "tel:211" }, { label: "Search online", href: "https://211ontario.ca", alt: true }],
-      fr: { who: "Tout l'Ontario · 24/7", title: "Appelez le 211 Ontario", body: "Composez le 2-1-1 depuis n'importe quel téléphone, gratuitement, à toute heure. On vous écoute, puis on vous met en lien avec de l'aide locale, quoi que vous traversiez. Plus de 150 langues.", actions: [{ label: "Appelez le 211", href: "tel:211" }, { label: "Chercher en ligne", href: "https://211ontario.ca/fr/", alt: true }] } }
-  ];
-
-  var TIPS = [
-    { h: "Avoid high-interest debt", p: "Payday loans and “instant pay” apps are the most expensive way to borrow. Try 211 or a food bank for emergency basics first. It's free, not a loan.",
-      hFr: "Évitez les dettes à intérêt élevé", pFr: "Les prêts sur salaire et les applications de « paie instantanée » sont la façon la plus chère d'emprunter. Pour les besoins de base urgents, essayez d'abord le 211 ou une banque alimentaire. C'est gratuit, pas un prêt." },
-    { h: "Pay highest-interest first", p: "If you owe on more than one thing, put extra money toward the debt with the biggest interest rate. It costs you the most each month.",
-      hFr: "Remboursez d'abord le taux le plus élevé", pFr: "Si vous devez de l'argent à plus d'un endroit, mettez le surplus sur la dette au taux d'intérêt le plus élevé. C'est elle qui vous coûte le plus chaque mois." },
-    { h: "A tiny buffer beats a loan", p: "Even $5–10 set aside when you can means an unexpected cost doesn't force you into borrowing at high interest later.",
-      hFr: "Un petit coussin vaut mieux qu'un prêt", pFr: "Même 5 à 10 $ mis de côté quand c'est possible, et un imprévu ne vous force plus à emprunter à taux élevé plus tard." },
-    { h: "Prices rising? Review, don't borrow", p: "When costs go up, the FCAC's advice is to trim expenses and avoid taking on new debt, rather than covering the gap with credit.",
-      hFr: "Les prix montent? Révisez, n'empruntez pas", pFr: "Quand les coûts augmentent, l'ACFC conseille de réduire les dépenses et d'éviter de nouvelles dettes, plutôt que de combler l'écart avec du crédit." }
-  ];
-
-  function el(t, c, h) { var e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; }
-  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-  function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
-
-  /* ---------- Live "open now" pill, computed from the visitor's clock ---------- */
-  function fmtMin(m) {
-    var hh = Math.floor(m / 60), mm = m % 60;
-    if (state.lang === "fr") { return hh + " h" + (mm ? " " + ("0" + mm).slice(-2) : ""); }
-    var ap = hh >= 12 ? "pm" : "am";
-    hh = hh % 12; if (hh === 0) hh = 12;
-    return hh + (mm ? ":" + ("0" + mm).slice(-2) : "") + ap;
+  function fill(str, vars) { return String(str).replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] != null ? vars[k] : m; }); }
+  function icon(id, cls) { return '<svg class="i' + (cls ? " " + cls : "") + '" aria-hidden="true"><use href="#i-' + id + '"/></svg>'; }
+  function fr() { return state.lang === "fr"; }
+  function cityName(slug) { var c = CITY[slug || ""]; return c ? (fr() && c.fr ? c.fr : c.en) : ""; }
+  function L(r) {
+    var f = fr() && r.fr ? r.fr : {};
+    return { who: f.who || r.who, title: f.title || r.title, body: f.body || r.body, actions: f.actions || r.actions, regionLabel: f.regionLabel || r.regionLabel };
   }
-  /* Ontario services keep Ontario hours: pin the clock to Toronto, not the device. */
+  function motionOK() { return !(reduce && reduce.matches); }
+  function scrollToEl(el) {
+    if (!el) return;
+    el.scrollIntoView({ behavior: motionOK() ? "smooth" : "auto", block: "start" });
+  }
+
+  /* ---------- language ---------- */
+  function applyLang() {
+    var html = document.documentElement;
+    html.lang = fr() ? "fr-CA" : "en";
+    document.title = S("docTitle");
+    var md = document.querySelector('meta[name="description"]');
+    if (md) md.setAttribute("content", S("metaDesc"));
+    var nodes = document.querySelectorAll("[data-t]");
+    for (var i = 0; i < nodes.length; i++) {
+      var v = S(nodes[i].getAttribute("data-t"));
+      if (typeof v === "string") nodes[i].textContent = v;
+    }
+    var attrs = document.querySelectorAll("[data-ta]");
+    for (var j = 0; j < attrs.length; j++) {
+      attrs[j].getAttribute("data-ta").split(";").forEach(function (pair) {
+        var p = pair.split(":");
+        var val = S(p[1]);
+        if (typeof val === "string") attrs[j].setAttribute(p[0], val);
+      });
+    }
+    var lb = $("lang");
+    lb.textContent = S("langBtn");
+    lb.setAttribute("lang", S("langBtnLang"));
+    lb.setAttribute("aria-label", S("langBtnAria"));
+    buildCitySelect($("city"));
+    buildChips(); buildPaths(); buildTiles(); buildGround(); buildPlanForm(); buildNumbers();
+    paintSky();
+  }
+
+  /* ---------- URL: language, view and city, replaced in place (never pushed) ---------- */
+  var PRIVATE_VIEWS = { safe: true };
+  function syncURL() {
+    var parts = [], v = state.view;
+    if (fr()) parts.push("fr");
+    var tab = v && v.kind === "tab" && !PRIVATE_VIEWS[v.id] ? v.id : "";
+    if (tab) parts.push(tab);
+    else if (state.city) parts.push("home");
+    if (state.city) parts.push(state.city);
+    var h = parts.length ? "#" + parts.join("/") : location.pathname + location.search;
+    try { history.replaceState(null, "", h); } catch (e) {}
+  }
+  /* #[fr/][tab|home][/city]. Anything else (#help, #main) is not a route and changes nothing. */
+  function parseHash() {
+    var h = location.hash.replace(/^#/, "");
+    if (!h) return false;
+    var parts = h.split("/"), lang = "en";
+    if (parts[0] === "fr") { lang = "fr"; parts.shift(); }
+    var tab = parts[0] || "", city = parts[1] || "";
+    if (tab && tab !== "home" && !TAB[tab]) return false;
+    state.lang = lang;
+    state.city = CITY[city] ? city : "";
+    state.view = tab && tab !== "home" ? { kind: "tab", id: tab } : null;
+    return true;
+  }
+
+  /* ---------- the sky ---------- */
+  function paintSky() {
+    if (!SKY) return;
+    var p = SKY.palette(new Date());
+    var s = p.stops, g = p.glow;
+    var root = document.documentElement.style;
+    root.setProperty("--sky", "linear-gradient(90deg," + s[0] + " 0%," + s[1] + " " + Math.max(g - 34, 1) + "%," + s[2] + " " + g + "%," + s[3] + " " + Math.min(g + 34, 99) + "%," + s[4] + " 100%)");
+    root.setProperty("--sky-top", s[0]);
+    root.setProperty("--sky-mid", s[1]);
+    root.setProperty("--sky-glow", s[2]);
+    root.setProperty("--sun", p.sun);
+    document.documentElement.setAttribute("data-sky", p.phase);
+    var sr = SKY.nextSunrise(new Date());
+    var el = $("sunrise");
+    if (el && sr) {
+      var t;
+      try { t = new Intl.DateTimeFormat(fr() ? "fr-CA" : "en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" }).format(sr); }
+      catch (e) { t = sr.toTimeString().slice(0, 5); }
+      el.textContent = fill(S("sunrise"), { t: t });
+    }
+  }
+
+  /* ---------- hours and live status (pinned to Ontario time) ---------- */
   function nowInOntario() {
     try {
       var parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", hour12: false, weekday: "short", hour: "numeric", minute: "numeric" }).formatToParts(new Date());
@@ -300,332 +130,823 @@
       return { day: d.getDay(), mins: d.getHours() * 60 + d.getMinutes() };
     }
   }
-
-  function hoursPill(h) {
-    if (!h) return "";
-    if (h === "24/7") return '<span class="hrs always" title="' + escAttr(S("hrsAlwaysTitle")) + '">24/7</span>';
-    var now = nowInOntario(), day = now.day, mins = now.mins;
-    var openToday = h.days.indexOf(day) > -1;
-    if (openToday && mins >= h.from && mins < h.to) {
-      return '<span class="hrs open">' + S("hrsOpenUntil") + fmtMin(h.to) + "</span>";
+  function fmtMin(m) {
+    var hh = Math.floor(m / 60), mm = m % 60;
+    if (fr()) return hh + " h" + (mm ? " " + ("0" + mm).slice(-2) : "");
+    var ap = hh >= 12 ? "pm" : "am";
+    hh = hh % 12; if (hh === 0) hh = 12;
+    return hh + (mm ? ":" + ("0" + mm).slice(-2) : "") + ap;
+  }
+  function hasPhone(r) { return r.actions.some(function (a) { return /^(tel|sms):/.test(a.href); }); }
+  function status(r) {
+    var st = S("status"), h = r.hours;
+    if (h === "24/7") return { cls: "s-always", text: st.always };
+    if (h && h.days) {
+      var now = nowInOntario();
+      if (h.days.indexOf(now.day) > -1 && now.mins >= h.from && now.mins < h.to) return { cls: "s-open", text: fill(st.open, { t: fmtMin(h.to) }) };
+      if (h.days.indexOf(now.day) > -1 && now.mins < h.from) return { cls: "s-closed", text: fill(st.opens, { t: fmtMin(h.from) }) };
+      for (var k = 1; k <= 7; k++) {
+        var d = (now.day + k) % 7;
+        if (h.days.indexOf(d) > -1) {
+          if (k === 1 && h.days.length === 7) return { cls: "s-closed", text: fill(st.opens, { t: fmtMin(h.from) }) };
+          return { cls: "s-closed", text: fill(st.opensDay, { day: S("days")[d], t: fmtMin(h.from) }) };
+        }
+      }
     }
-    var lbl = state.lang === "fr" && h.labelFr ? h.labelFr : h.label;
-    var suffix = h.days.length < 7 ? " &middot; " + lbl : "";
-    return '<span class="hrs closed">' + S("hrsOpens") + fmtMin(h.from) + suffix + "</span>";
+    return hasPhone(r) ? { cls: "s-confirm", text: st.confirm } : { cls: "s-online", text: st.online };
+  }
+  function refreshStatus() {
+    var els = document.querySelectorAll(".status[data-id]");
+    for (var i = 0; i < els.length; i++) {
+      var r = BY_ID[els[i].getAttribute("data-id")];
+      if (!r) continue;
+      var s = status(r);
+      els[i].className = "status " + s.cls;
+      els[i].textContent = s.text;
+    }
   }
 
-  /* ---------- Opening lines, for when picking up the phone is the hard part ---------- */
-  var SAY = {
-    en: {
-      talk: ["I don't know where to start. I just need to talk to someone.",
-             "I'm not doing okay, and I don't want to be alone with this right now."],
-      safe: ["I don't feel safe at home. Can you help me understand my options?",
-             "Someone close to me is scaring me. I don't know what to do."]
-    },
-    fr: {
-      talk: ["Je ne sais pas par où commencer. J'ai juste besoin de parler à quelqu'un.",
-             "Ça ne va pas, et je ne veux pas rester seul(e) avec ça en ce moment."],
-      safe: ["Je ne me sens pas en sécurité chez moi. Pouvez-vous m'aider à comprendre mes options?",
-             "Quelqu'un de proche me fait peur. Je ne sais pas quoi faire."]
-    }
-  };
-  function sayitHTML(tab) {
-    var say = SAY[state.lang];
-    if (!say[tab]) return "";
-    var open = state.lang === "fr" ? "&laquo;&nbsp;" : "&ldquo;", close = state.lang === "fr" ? "&nbsp;&raquo;" : "&rdquo;";
-    var lines = say[tab].map(function (q) { return '<p class="line">' + open + esc(q) + close + "</p>"; }).join("");
-    return '<details class="sayit"><summary>' + esc(S("saySummary")) + "</summary><div>" +
-      lines + '<p class="reassure">' + esc(S("sayReassure")) + "</p></div></details>";
+  /* ---------- cards ---------- */
+  function displayNumber(href) {
+    var n = href.replace(/^(tel|sms):/, "").replace(/\?.*$/, "");
+    if (n.length <= 4) return n;
+    var d = n.replace(/\D/g, "");
+    if (d.length === 11 && d[0] === "1") d = d.slice(1);
+    if (d.length !== 10) return n;
+    return fr() ? "1 " + d.slice(0, 3) + " " + d.slice(3, 6) + "-" + d.slice(6) : (n.length === 11 ? "1-" : "") + d.slice(0, 3) + "-" + d.slice(3, 6) + "-" + d.slice(6);
   }
-
-  function visibleFor(tab, city) {
-    var reg = regionOf(city);
-    var list = R.filter(function (r) {
-      if (r.cats.indexOf(tab) === -1) return false;
-      if (!r.region) return true;
-      if (city === ALL) return true;
-      return r.region === reg;
+  function catIcon(r, tab) {
+    if (r.id === "911") return "lifebuoy";
+    var t = TAB[tab] || TAB[r.cats[0]] || TAB.all;
+    return t.icon;
+  }
+  function cardHTML(r, tab) {
+    var l = L(r), st = status(r);
+    var phone = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); });
+    var web = l.actions.filter(function (a) { return /^https?:/.test(a.href); });
+    /* Call and Text lead. A local listing whose own action is a website keeps it first,
+       and its "call 211 to confirm" line moves down with the quiet actions. */
+    var webFirst = l.actions.length && /^https?:/.test(l.actions[0].href) && phone.every(function (a) { return a.href === "tel:211"; });
+    var primary = phone.length && !webFirst ? phone : web.slice(0, 1);
+    var quiet = phone.length && !webFirst ? web : web.slice(1).concat(phone);
+    var html = '<article class="card' + (r.hot ? " hot" : "") + '" data-id="' + esc(r.id) + '">';
+    html += '<div class="card-top"><span class="card-ic">' + icon(catIcon(r, tab)) + "</span>" +
+      '<p class="kicker">' + esc(l.who) + "</p>" +
+      '<span class="status ' + st.cls + '" data-id="' + esc(r.id) + '">' + esc(st.text) + "</span></div>";
+    html += "<h3>" + esc(l.title) + "</h3>";
+    html += '<p class="card-body">' + esc(l.body) + "</p>";
+    html += '<div class="acts">' + primary.map(function (a) {
+      var ic = /^tel:/.test(a.href) ? "call" : /^sms:/.test(a.href) ? "text" : "arrow";
+      var ext = /^https?:/.test(a.href) ? ' target="_blank" rel="noopener noreferrer"' : "";
+      return '<a class="btn btn-primary" href="' + esc(a.href) + '"' + ext + ">" + icon(ic) + "<span>" + esc(a.label) + "</span></a>";
+    }).join("") + "</div>";
+    var q = quiet.map(function (a) {
+      var tel = /^(tel|sms):/.test(a.href);
+      var ic = tel ? "call" : /chat|clavard/i.test(a.label) ? "chat" : "web";
+      return '<a class="btn btn-quiet" href="' + esc(a.href) + '"' + (tel ? "" : ' target="_blank" rel="noopener noreferrer"') + ">" + icon(ic) + "<span>" + esc(a.label) + "</span></a>";
     });
-    // local-first when a specific city is chosen
-    if (city !== ALL) list.sort(function (a, b) { return (b.region ? 1 : 0) - (a.region ? 1 : 0); });
+    var firstPhone = phone[0];
+    if (firstPhone) q.push('<button class="btn btn-quiet" type="button" data-copy="' + esc(displayNumber(firstPhone.href)) + '">' + icon("copy") + "<span>" + esc(S("copyNumber")) + "</span></button>");
+    q.push('<button class="btn btn-quiet" type="button" data-share="' + esc(r.id) + '">' + icon("share") + "<span>" + esc(S("share")) + "</span></button>");
+    html += '<div class="acts2">' + q.join("") + "</div>";
+    var meta = r.local ? S("tagLocal") : S("tagChecked");
+    var where = r.region ? fill(S("tagIn"), { city: l.regionLabel || cityName(state.city) }) : (r.scope ? S("scope")[r.scope] : "");
+    html += '<p class="card-meta"><span>' + icon("verified") + esc(meta) + "</span>" + (where ? "<span>" + icon("pin") + esc(where) + "</span>" : "") + "</p>";
+    return html + "</article>";
+  }
+  function dedupe(list) {
+    var seen = {}, out = [];
+    list.forEach(function (r) { var k = r.svc || r.id; if (r && !seen[k]) { seen[k] = true; out.push(r); } });
+    return out;
+  }
+  function regionOf(slug) { var c = CITY[slug || ""]; return c && c.region ? c.region : "other"; }
+  function visible(r) { return !r.region || !state.city || r.region === regionOf(state.city); }
+  function tabList(tab) {
+    var list = D.R.filter(function (r) { return r.cats.indexOf(tab) > -1 && visible(r); });
+    if (state.city) list.sort(function (a, b) { return (b.region ? 1 : 0) - (a.region ? 1 : 0); });
     return list;
   }
+  function idList(ids) { return ids.map(function (id) { return BY_ID[id]; }).filter(function (r) { return r && visible(r); }); }
 
-  function cardHTML(r, i, tab, city) {
-    var fr = state.lang === "fr" && r.fr ? r.fr : null;
-    var who = fr ? fr.who : r.who;
-    var title = fr && fr.title ? fr.title : r.title;
-    var body = fr ? fr.body : r.body;
-    var acts = fr && fr.actions ? fr.actions : r.actions;
-    var regionLabel = fr && fr.regionLabel ? fr.regionLabel : r.regionLabel;
-    var color = r.hot ? "var(--coral)" : COLOR[tab];
-    var icon = TABS.filter(function (t) { return t.id === tab; })[0].icon;
-    var foot = "";
-    /* Honest labels: a regional card names its own region; a province-wide or national
-       line says so; nothing is ever stamped "available in" a city it does not serve. */
-    if (r.local) foot += '<span class="tag local">' + S("tagLocal") + "</span>";
-    else foot += '<span class="tag">' + esc(S("tagChecked")) + "</span>";
-    if (r.region) foot += '<span class="tag here-tag">' + STR[state.lang].tagIn(regionLabel || city) + "</span>";
-    else if (r.scope) foot += '<span class="tag">' + esc(S("scope")[r.scope]) + "</span>";
-    acts.forEach(function (a) {
-      var cls = a.alt ? "go alt" : "go";
-      var arrow = a.alt ? "" : ' <span aria-hidden="true">→</span>';
-      var ext = a.href.indexOf("http") === 0 ? ' target="_blank" rel="noopener noreferrer"' : "";
-      foot += '<a class="' + cls + '" href="' + a.href + '"' + ext + ">" + esc(a.label) + arrow + "</a>";
+  /* ---------- weather safety (Open-Meteo, the one live source) ---------- */
+  var wxCache = {};
+  function weatherFor(slug, cb) {
+    var c = CITY[slug];
+    if (!c || c.lat == null || !window.fetch) return cb(null);
+    var hour = Math.floor(Date.now() / 3600000);
+    var key = slug + ":" + hour;
+    if (wxCache[key] !== undefined) return cb(wxCache[key]);
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=" + c.lat + "&longitude=" + c.lon +
+      "&hourly=apparent_temperature&daily=apparent_temperature_max&timezone=America%2FToronto&forecast_days=2";
+    fetch(url, { signal: ctl ? ctl.signal : undefined, credentials: "omit", referrerPolicy: "no-referrer" })
+      .then(function (res) { if (!res.ok) throw new Error("http " + res.status); return res.json(); })
+      .then(function (j) {
+        clearTimeout(timer);
+        var out = null;
+        var times = j.hourly && j.hourly.time, temps = j.hourly && j.hourly.apparent_temperature;
+        var nowISO = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hour12: false }).format(new Date()).replace(" ", "T").slice(0, 13);
+        var low = null;
+        if (times && temps) {
+          var today = nowISO.slice(0, 10);
+          for (var i = 0; i < times.length; i++) {
+            var t = times[i].slice(0, 13);
+            if (t < nowISO) continue;
+            /* tonight: from now until 8 am tomorrow */
+            if (t.slice(0, 10) > today && parseInt(t.slice(11, 13), 10) > 8) break;
+            if (typeof temps[i] === "number" && (low === null || temps[i] < low)) low = temps[i];
+          }
+        }
+        var high = j.daily && j.daily.apparent_temperature_max ? j.daily.apparent_temperature_max[0] : null;
+        if (low !== null && low <= -15) out = { kind: "cold", t: Math.round(low) };
+        else if (typeof high === "number" && high >= 32) out = { kind: "hot", t: Math.round(high) };
+        wxCache[key] = out;
+        cb(out);
+      })
+      .catch(function () { clearTimeout(timer); cb(null); });
+  }
+  function fmtTemp(t) { return (t < 0 ? "\u2212" + Math.abs(t) : String(t)) + (fr() ? "\u00a0\u00b0C" : "\u00b0C"); }
+  function wxHTML(w) {
+    if (!w) return "";
+    var W = S("weather");
+    return '<div class="wx' + (w.kind === "hot" ? " hot" : "") + '" role="note">' + icon(w.kind === "hot" ? "sun" : "snow") +
+      '<p class="wx-t">' + esc(fill(W[w.kind], { t: fmtTemp(w.t), city: cityName(state.city) })) + "</p>" +
+      '<div class="row"><a class="btn btn-primary" href="tel:211">' + icon("call") + "<span>" + esc(W.call) + "</span></a>" +
+      '<button class="btn btn-quiet" type="button" data-tab="safe">' + icon("safe") + "<span>" + esc(W.safe) + "</span></button></div>" +
+      '<p class="note">' + esc(W.source) + "</p></div>";
+  }
+  function paintWeather() {
+    var slots = document.querySelectorAll("[data-weather]");
+    if (!state.city) { for (var i = 0; i < slots.length; i++) slots[i].innerHTML = ""; return; }
+    var city = state.city;
+    weatherFor(city, function (w) {
+      if (city !== state.city) return;
+      var s = document.querySelectorAll("[data-weather]");
+      for (var k = 0; k < s.length; k++) s[k].innerHTML = wxHTML(w);
     });
-    var shareText = title + " · " + acts[0].label + " · " + S("shareSuffix");
-    var shareBtn = '<button class="share" type="button" data-stext="' + escAttr(shareText) + '" aria-label="' + escAttr(S("shareAria")) + '" title="' + escAttr(S("shareAria")) + '">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>';
-    return '<article class="res' + (r.hot ? " hot" : "") + '" style="--cat:' + color + ';animation-delay:' + (i * 50) + 'ms">' +
-      '<div class="top"><span class="dot">' + icon + '</span><span class="who">' + esc(who) + "</span>" + hoursPill(r.hours) + shareBtn + "</div>" +
-      "<h3>" + esc(title) + "</h3><p>" + esc(body) + "</p>" +
-      '<div class="foot">' + foot + "</div></article>";
   }
 
-  function render() {
-    var tab = TABS.filter(function (t) { return t.id === state.tab; })[0];
-    var isFr = state.lang === "fr";
-    var list = visibleFor(state.tab, state.city);
-    var html = '<section class="panel">';
-    html += '<div class="phead"><h2>' + esc(isFr ? tab.titleFr : tab.title) + '</h2><span class="note">' + esc(isFr ? tab.noteFr : tab.note) + "</span></div>";
-    html += '<p class="pintro">' + INTRO[state.lang][state.tab](state.city) + "</p>";
-    html += sayitHTML(state.tab);
-    html += '<div class="cards">' + list.map(function (r, i) { return cardHTML(r, i, state.tab, state.city); }).join("") + "</div>";
-    if (state.tab === "money") html += '<div class="tips">' + TIPS.map(function (t) { return '<div class="tip"><h4>' + esc(isFr ? t.hFr : t.h) + "</h4><p>" + esc(isFr ? t.pFr : t.p) + "</p></div>"; }).join("") + "</div>";
-    html += "</section>";
-    document.getElementById("panel").innerHTML = html;
-
-    // Honest count: distinct services in the list on screen (211 or Kids Help Phone count once)
-    var seen = {}, total = 0;
-    list.forEach(function (r) { var k = r.svc || r.id; if (!seen[k]) { seen[k] = true; total++; } });
-    var hint = document.getElementById("cityhint");
-    if (state.city === ALL) hint.innerHTML = STR[state.lang].hintAll(total);
-    else hint.innerHTML = STR[state.lang].hintCity(total, state.city);
-    var locText = document.getElementById("locText");
-    if (locText) locText.textContent = state.city === ALL ? "Ontario" : state.city;
-  }
-
-  function tabLabel(t) { return state.lang === "fr" ? t.labelFr : t.label; }
-
-  function buildChrome() {
-    var tl = document.getElementById("tablist");
-    TABS.forEach(function (t, i) {
-      var b = el("button", "tab");
-      b.type = "button"; b.setAttribute("role", "tab");
-      b.setAttribute("aria-selected", String(i === 0));
-      b.id = "tab-" + t.id;
-      b.style.setProperty("--cat", COLOR[t.id]);
-      b.innerHTML = '<span class="ic">' + t.icon + "</span>" + esc(tabLabel(t));
-      b.addEventListener("click", function () { selectTab(t.id); });
-      b.addEventListener("keydown", function (e) {
-        var idx = i;
-        if (e.key === "ArrowRight") idx = (i + 1) % TABS.length;
-        else if (e.key === "ArrowLeft") idx = (i - 1 + TABS.length) % TABS.length;
-        else return;
-        e.preventDefault(); tl.children[idx].focus(); selectTab(TABS[idx].id);
-      });
-      tl.appendChild(b);
-    });
-    var sel = document.getElementById("city");
-    CITIES.forEach(function (c) { var o = el("option"); o.value = c; o.textContent = c === ALL ? S("allCity") : c; sel.appendChild(o); });
+  /* ---------- building blocks ---------- */
+  function buildCitySelect(sel) {
+    if (!sel) return;
+    sel.innerHTML = D.CITIES.map(function (c) {
+      return '<option value="' + c.slug + '"' + (c.slug === state.city ? " selected" : "") + ">" + esc(fr() && c.fr ? c.fr : c.en) + "</option>";
+    }).join("");
     sel.value = state.city;
-    sel.addEventListener("change", function () {
-      state.city = sel.value; syncURL(); rerender();
-      var card = document.querySelector(".citycard");
-      if (card) { card.animate([{ boxShadow: "0 0 0 3px rgba(12,110,131,.35)" }, { boxShadow: "var(--sh-card)" }], { duration: 600, easing: "ease-out" }); }
-    });
   }
-
-  /* ---------- Language: swap every static string, keep the promise (nothing stored) ---------- */
-  function applyLang() {
-    var isFr = state.lang === "fr";
-    document.documentElement.lang = isFr ? "fr-CA" : "en";
-    document.title = S("docTitle");
-    var md = document.querySelector('meta[name="description"]');
-    if (md) md.setAttribute("content", S("metaDesc"));
-
-    var statics = STR[state.lang].static;
-    var nodes = document.querySelectorAll("[data-i18n]");
-    for (var i = 0; i < nodes.length; i++) {
-      var key = nodes[i].getAttribute("data-i18n");
-      if (statics[key] != null) nodes[i].innerHTML = statics[key];
-    }
-
-    var splash = document.getElementById("splash");
-    if (splash) splash.setAttribute("aria-label", S("splashLabel"));
-    var urgent = document.querySelector(".urgent");
-    if (urgent) urgent.setAttribute("aria-label", S("urgentLabel"));
-    var qe = document.getElementById("quickExit");
-    if (qe) qe.title = S("quickExitTitle");
-    var sel = document.getElementById("city");
-    if (sel) {
-      sel.setAttribute("aria-label", S("cityAria"));
-      if (sel.options.length) sel.options[0].textContent = S("allCity");
-    }
-    var tabsNav = document.querySelector(".tabs");
-    if (tabsNav) tabsNav.setAttribute("aria-label", S("tabsAria"));
-    var brand = document.querySelector(".brand");
-    if (brand) brand.setAttribute("aria-label", S("brandAria"));
-    TABS.forEach(function (t) {
-      var b = document.getElementById("tab-" + t.id);
-      if (b) b.innerHTML = '<span class="ic">' + t.icon + "</span>" + esc(tabLabel(t));
-    });
-    var lb = document.getElementById("langBtn");
-    if (lb) {
-      lb.textContent = S("langBtnText");
-      lb.setAttribute("lang", S("langBtnLang"));
-      lb.setAttribute("aria-label", S("langBtnLabel"));
+  function pressed(kind, id) { return state.view && state.view.kind === kind && state.view.id === id ? "true" : "false"; }
+  function buildChips() {
+    $("chips").innerHTML = D.SITUATIONS.map(function (s) {
+      return '<button class="chip" type="button" data-sit="' + s.id + '" aria-pressed="' + pressed("sit", s.id) + '">' + icon(s.icon) + "<span>" + esc(s[state.lang]) + "</span></button>";
+    }).join("");
+  }
+  function buildPaths() {
+    $("paths").innerHTML = D.PATHS.map(function (p) {
+      var c = S("paths")[p.id];
+      return '<button class="path' + (p.hot ? " hot" : "") + '" type="button" data-path="' + p.id + '" aria-pressed="' + pressed("path", p.id) + '">' +
+        '<span class="path-ic">' + icon(p.icon) + '</span><span><span class="path-t">' + esc(c.label) + '</span><span class="path-s">' + esc(c.sub) + "</span></span>" + icon("chevron") + "</button>";
+    }).join("");
+  }
+  function buildTiles() {
+    $("tiles").innerHTML = D.TABS.map(function (t) {
+      return '<button class="tile" type="button" data-tab="' + t.id + '" aria-pressed="' + pressed("tab", t.id) + '">' + icon(t.icon) + "<span>" + esc(t[state.lang].label) + "</span></button>";
+    }).join("");
+  }
+  function markPressed() {
+    var all = document.querySelectorAll("[data-sit],[data-path],.tile[data-tab]");
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var kind = el.hasAttribute("data-sit") ? "sit" : el.hasAttribute("data-path") ? "path" : "tab";
+      var id = el.getAttribute("data-sit") || el.getAttribute("data-path") || el.getAttribute("data-tab");
+      el.setAttribute("aria-pressed", pressed(kind, id));
     }
   }
 
-  function setLang(l) {
-    if (state.lang === l) return;
-    state.lang = l;
+  /* ---------- the panel: a situation, a path or a category ---------- */
+  function sayHTML(tab) {
+    var lines = D.SAY[state.lang] && D.SAY[state.lang][tab];
+    if (!lines) return "";
+    var o = fr() ? "\u00ab\u00a0" : "\u201c", c = fr() ? "\u00a0\u00bb" : "\u201d";
+    return '<details class="sayit"><summary>' + icon("talk") + "<span>" + esc(S("saySummary")) + "</span>" + icon("chevron") + "</summary><div>" +
+      lines.map(function (q) { return '<p class="line">' + o + esc(q) + c + "</p>"; }).join("") +
+      '<p class="reassure">' + esc(S("sayReassure")) + "</p></div></details>";
+  }
+  function introText(tab) {
+    var t = D.INTRO[state.lang][tab];
+    if (!t) return "";
+    var city = cityName(state.city);
+    t = t.replace(/<\/?b>/g, "");
+    return fill(t, {
+      here: state.city ? fill(S("hereCity"), { city: city }) : S("here"),
+      hereAll: state.city ? fill(S("hereAllCity"), { city: city }) : S("hereAll")
+    });
+  }
+  function countText(list) {
+    var n = dedupe(list).length;
+    return state.city ? fill(S("hintCity"), { n: n, city: cityName(state.city) }) : fill(S("hintAll"), { n: n });
+  }
+  function exitNoteHTML() {
+    return '<p class="exit-note">' + icon("exit") + "<span>" + esc(S("exitHelp")) + " " + esc(S("exitPrivacy")) + "</span></p>";
+  }
+  function cityBarHTML(list) {
+    return '<div class="panel-bar"><div class="select"><select data-city aria-label="' + esc(S("cityAria")) + '"></select>' + icon("chevron") + "</div>" +
+      '<p class="count">' + esc(countText(list)) + "</p></div>";
+  }
+
+  function renderPanel(focus) {
+    var panel = $("panel"), v = state.view;
+    markPressed();
+    if (!v) { panel.hidden = true; panel.innerHTML = ""; return; }
+    var html = '<div class="panel-in"><div class="panel-head">', list = [], tabForIcon = null, crisisLine = "", body = "", after = "";
+    if (v.kind === "tab") {
+      var t = TAB[v.id], tt = t[state.lang];
+      list = tabList(v.id);
+      tabForIcon = v.id;
+      html += '<p class="eyebrow">' + icon(t.icon) + esc(S("browseTitle")) + "</p><h2 tabindex=\"-1\">" + esc(tt.title) + '</h2><p class="panel-note">' + esc(tt.note) + "</p>";
+      body += '<p class="lead">' + esc(introText(v.id)) + "</p>";
+      if (v.id === "safe") body += exitNoteHTML();
+      body += sayHTML(v.id);
+      if (v.id === "food" || v.id === "safe") body += '<div data-weather="panel"></div>';
+      body += cityBarHTML(list);
+      if (v.id === "money") after += '<div class="tips">' + D.TIPS.map(function (tp) {
+        return '<div class="tip"><h4>' + esc(fr() ? tp.hFr : tp.h) + "</h4><p>" + esc(fr() ? tp.pFr : tp.p) + "</p></div>";
+      }).join("") + "</div>";
+    } else if (v.kind === "sit") {
+      var s = D.SITUATIONS.filter(function (x) { return x.id === v.id; })[0];
+      var st = TAB[s.tab];
+      list = s.ids ? idList(s.ids) : tabList(s.tab);
+      tabForIcon = s.tab;
+      html += '<p class="eyebrow">' + icon(s.icon) + esc(S("chipsLabel")) + "</p><h2 tabindex=\"-1\">" + esc(s[state.lang]) + "</h2>";
+      if (s.crisis) crisisLine = S("crisis")[s.crisis];
+      body += '<p class="lead">' + esc(introText(s.tab)) + "</p>";
+      if (s.crisis === "abuse" || s.tab === "safe") body += exitNoteHTML();
+      if (!s.crisis) body += sayHTML(s.tab);
+      if (s.weather || s.tab === "food") body += '<div data-weather="panel"></div>';
+      body += cityBarHTML(list);
+      after += '<div class="seeall"><button class="btn btn-quiet" type="button" data-tab="' + st.id + '">' + icon(st.icon) + "<span>" + esc(fill(S("seeAll"), { tab: st[state.lang].title })) + "</span></button></div>";
+    } else if (v.kind === "path") {
+      var p = D.PATHS.filter(function (x) { return x.id === v.id; })[0], pc = S("paths")[v.id];
+      list = p.ids ? idList(p.ids) : tabList(p.tab);
+      tabForIcon = p.tab || "talk";
+      html += '<p class="eyebrow">' + icon(p.icon) + esc(S("pathsLabel")) + "</p><h2 tabindex=\"-1\">" + esc(pc.title) + "</h2>";
+      if (v.id === "now") crisisLine = S("crisis").self;
+      if (pc.lead) body += '<p class="lead">' + esc(pc.lead) + "</p>";
+      else if (p.tab) body += '<p class="lead">' + esc(introText(p.tab)) + "</p>";
+      if (pc.steps) body += '<ol class="steps">' + pc.steps.map(function (x) { return "<li><span>" + esc(x) + "</span></li>"; }).join("") + "</ol>";
+      if (v.id === "now") body += '<div class="wait"><p>' + esc(S("whileYouWait")) + '</p><button class="btn btn-quiet" type="button" data-open="breathe">' + icon("breathe") + "<span>" + esc(S("breatheLink")) + "</span></button></div>";
+      if (p.tab) body += cityBarHTML(list);
+    }
+    html += "</div>";
+    if (crisisLine) html += '<p class="crisis-line">' + esc(crisisLine) + "</p>";
+    html += body;
+    list = dedupe(list);
+    html += '<div class="cards">' + list.map(function (r) { return cardHTML(r, tabForIcon); }).join("") + "</div>";
+    html += after;
+    html += '<div class="panel-foot"><a class="btn btn-quiet" href="#browse" data-jump="browse">' + icon("compass") + "<span>" + esc(S("backToBrowse")) + "</span></a></div></div>";
+    panel.innerHTML = html;
+    panel.hidden = false;
+    var sels = panel.querySelectorAll("select[data-city]");
+    for (var i = 0; i < sels.length; i++) buildCitySelect(sels[i]);
+    paintWeather();
+    if (focus) {
+      scrollToEl(panel);
+      var h2 = panel.querySelector("h2");
+      if (h2) h2.focus({ preventScroll: true });
+    }
+  }
+  function openView(v, focus) {
+    state.view = v;
     syncURL();
-    applyLang();
-    rerender();
+    renderPanel(focus);
   }
 
-  function initLangToggle() {
-    var lb = document.getElementById("langBtn");
-    if (!lb) return;
-    lb.addEventListener("click", function () { setLang(state.lang === "en" ? "fr" : "en"); });
+  /* ---------- search: on this device only ---------- */
+  var qTimer = null;
+  function renderAnswer() {
+    var box = $("answer"), q = state.q;
+    $("qclear").hidden = !q;
+    if (!q.trim() || !I) { box.hidden = true; box.innerHTML = ""; $("qlive").textContent = ""; return; }
+    var m = I.match(q);
+    var list = dedupe(idList(m.ids)).slice(0, 8);
+    var html = "";
+    if (m.crisis) html += '<p class="crisis-line">' + esc(S("crisis")[m.crisis]) + "</p>";
+    if (!list.length) {
+      html += '<p class="nomatch">' + esc(S("noMatch")) + "</p>";
+      list = [BY_ID["211"]];
+    }
+    var n = list.length;
+    html += '<div class="answer-head"><p class="answer-count">' + esc(n === 1 ? S("result1") : fill(S("results"), { n: n })) + "</p></div>";
+    if (m.crisis === "abuse") html += exitNoteHTML();
+    html += '<div class="cards">' + list.map(function (r) { return cardHTML(r, m.tabs[0]); }).join("") + "</div>";
+    var tabs = m.tabs.filter(function (t) { return TAB[t]; }).slice(0, 2);
+    if (tabs.length) html += '<div class="seeall">' + tabs.map(function (t) {
+      return '<button class="btn btn-quiet" type="button" data-tab="' + t + '">' + icon(TAB[t].icon) + "<span>" + esc(fill(S("seeAll"), { tab: TAB[t][state.lang].title })) + "</span></button>";
+    }).join("") + "</div>";
+    box.innerHTML = html;
+    box.hidden = false;
+    var live = (m.crisis ? S("crisis")[m.crisis] + " " : "") + (n === 1 ? S("result1") : fill(S("results"), { n: n }));
+    $("qlive").textContent = live;
   }
-
-  /* Smooth cross-fade between panels where the browser supports it; instant elsewhere. */
-  function rerender() {
-    var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (document.startViewTransition && !rm) { document.startViewTransition(render); }
-    else { render(); }
-  }
-
-  function selectTab(id, noHistory) {
-    state.tab = id;
-    TABS.forEach(function (t) { document.getElementById("tab-" + t.id).setAttribute("aria-selected", String(t.id === id)); });
-    if (!noHistory) syncURL();
-    rerender();
-  }
-
-  /* ---------- Shareable state: #[fr/]category/city in the URL, back button works ---------- */
-  function citySlug(c) { return c === ALL ? "" : c.toLowerCase().replace(/[.\s]+/g, "-"); }
-  function cityFromSlug(slug) {
-    for (var i = 0; i < CITIES.length; i++) { if (citySlug(CITIES[i]) === slug) return CITIES[i]; }
-    return ALL;
-  }
-  function syncURL() {
-    var h = "#" + (state.lang === "fr" ? "fr/" : "") + state.tab + (state.city !== ALL ? "/" + citySlug(state.city) : "");
-    if (location.hash !== h) { try { history.pushState(null, "", h); } catch (e) {} }
-  }
-  function applyHash() {
-    var parts = location.hash.replace(/^#/, "").split("/");
-    state.lang = parts[0] === "fr" ? "fr" : "en";
-    if (parts[0] === "fr") parts.shift();
-    var tab = parts[0], city = cityFromSlug(parts[1] || "");
-    var known = TABS.some(function (t) { return t.id === tab; });
-    state.tab = known ? tab : "talk";
-    state.city = city;
-    TABS.forEach(function (t) {
-      var b = document.getElementById("tab-" + t.id);
-      if (b) b.setAttribute("aria-selected", String(t.id === state.tab));
+  function initSearch() {
+    var q = $("q");
+    q.addEventListener("input", function () {
+      state.q = q.value;
+      clearTimeout(qTimer);
+      qTimer = setTimeout(renderAnswer, 140);
     });
-    var sel = document.getElementById("city");
-    if (sel) sel.value = state.city;
+    q.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); clearTimeout(qTimer); renderAnswer(); var a = $("answer"); if (!a.hidden) scrollToEl(a); }
+      if (e.key === "Escape" && q.value) { e.preventDefault(); q.value = ""; state.q = ""; renderAnswer(); }
+    });
+    $("qclear").addEventListener("click", function () { q.value = ""; state.q = ""; renderAnswer(); q.focus(); });
   }
 
-  /* ---------- Share a resource (native sheet on mobile, copy elsewhere) ---------- */
-  function initShare() {
-    document.getElementById("panel").addEventListener("click", function (e) {
-      var b = e.target.closest ? e.target.closest(".share") : null;
-      if (!b) return;
-      e.preventDefault();
-      var text = b.getAttribute("data-stext"), url = location.href;
-      if (navigator.share) { navigator.share({ title: "h3lp", text: text, url: url }).catch(function () {}); }
-      else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text + " " + url).then(function () {
-          b.classList.add("done");
-          setTimeout(function () { b.classList.remove("done"); }, 1600);
-        }).catch(function () {});
+  /* ---------- copy and share ---------- */
+  function flash(btn, text) {
+    var span = btn.querySelector("span"), old = span.textContent;
+    btn.classList.add("done"); span.textContent = text;
+    setTimeout(function () { btn.classList.remove("done"); span.textContent = old; }, 1800);
+  }
+  function copyText(text, btn, label) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.className = "sr";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); flash(btn, label); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { flash(btn, label); }, fallback);
+    else fallback();
+  }
+  function shareEntry(id, btn) {
+    var r = BY_ID[id]; if (!r) return;
+    var l = L(r), first = l.actions[0];
+    var text = l.title + " · " + first.label + " · " + S("shareSuffix");
+    var url = location.origin + location.pathname + (fr() ? "#fr" : "");
+    if (navigator.share) navigator.share({ title: "h3lp", text: text, url: url }).catch(function () {});
+    else copyText(text + " " + url, btn, S("shared"));
+  }
+
+  /* ---------- one delegated click handler for the whole page ---------- */
+  function initClicks() {
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-sit],[data-path],[data-tab],[data-copy],[data-share],[data-open],[data-jump]") : null;
+      if (!t) return;
+      if (t.hasAttribute("data-sit")) { clearSearch(); openView({ kind: "sit", id: t.getAttribute("data-sit") }, true); }
+      else if (t.hasAttribute("data-path")) { clearSearch(); openView({ kind: "path", id: t.getAttribute("data-path") }, true); }
+      else if (t.hasAttribute("data-tab")) { if (sheetOpen) closeSheet(); openView({ kind: "tab", id: t.getAttribute("data-tab") }, true); }
+      else if (t.hasAttribute("data-copy")) copyText(t.getAttribute("data-copy"), t, S("copied"));
+      else if (t.hasAttribute("data-share")) shareEntry(t.getAttribute("data-share"), t);
+      else if (t.hasAttribute("data-open")) openSheet(t.getAttribute("data-open"), t);
+      else if (t.hasAttribute("data-jump")) { e.preventDefault(); var b = $(t.getAttribute("data-jump")); scrollToEl(b); var first = document.querySelector(".tile"); if (first) first.focus({ preventScroll: true }); }
+    });
+    document.addEventListener("change", function (e) {
+      var sel = e.target;
+      if (sel.id === "city" || sel.hasAttribute("data-city")) setCity(sel.value);
+    });
+  }
+  function clearSearch() { var q = $("q"); if (q.value) { q.value = ""; state.q = ""; renderAnswer(); } }
+  function setCity(slug) {
+    state.city = CITY[slug] ? slug : "";
+    var sels = document.querySelectorAll("#city, select[data-city]");
+    for (var i = 0; i < sels.length; i++) sels[i].value = state.city;
+    syncURL();
+    var focusSel = document.activeElement && document.activeElement.tagName === "SELECT" ? document.activeElement : null;
+    var inPanel = focusSel && focusSel.hasAttribute("data-city");
+    if (state.view) renderPanel(false);
+    if (state.q) renderAnswer();
+    paintWeather();
+    if (inPanel) { var s = document.querySelector("#panel select[data-city]"); if (s) s.focus(); }
+  }
+
+  /* ---------- Quick exit: button, or Shift three times within 5 seconds ---------- */
+  function quickExit(e) {
+    if (e) e.preventDefault();
+    var veil = $("veil");
+    veil.hidden = false;
+    try { document.title = ""; } catch (x) {}
+    var q = $("q"); if (q) q.value = "";
+    try { window.location.replace(EXIT_URL); } catch (x) { window.location.href = EXIT_URL; }
+  }
+  function initExit() {
+    var btn = $("exit"), live = $("shiftLive");
+    btn.addEventListener("click", quickExit);
+    var presses = [], reset = null;
+    function paint() {
+      btn.setAttribute("data-n", String(presses.length));
+      btn.classList.toggle("armed", presses.length > 0);
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Shift" || e.repeat) return;
+      var now = Date.now();
+      presses = presses.filter(function (t) { return now - t < 5000; });
+      presses.push(now);
+      paint();
+      if (presses.length >= 3) { quickExit(); return; }
+      live.textContent = fill(S("shiftLive"), { n: presses.length });
+      clearTimeout(reset);
+      reset = setTimeout(function () { presses = []; paint(); live.textContent = ""; }, 5000);
+    });
+  }
+
+  /* ---------- sheets (tools): closable, focus managed, strip stays usable ---------- */
+  var sheetOpen = null, sheetReturn = null;
+  function setInert(on) {
+    ["main", "footer", "header"].forEach(function (sel) {
+      var el = document.querySelector(sel === "main" ? "#main" : sel === "footer" ? ".foot" : "header.top");
+      if (!el) return;
+      if (on) { el.setAttribute("inert", ""); el.setAttribute("aria-hidden", "true"); }
+      else { el.removeAttribute("inert"); el.removeAttribute("aria-hidden"); }
+    });
+  }
+  function openSheet(id, from) {
+    var el = $("sheet-" + id);
+    if (!el) return;
+    if (sheetOpen) closeSheet(true);
+    sheetOpen = el; sheetReturn = from || document.activeElement;
+    el.hidden = false;
+    el.scrollTop = 0;
+    document.documentElement.classList.add("sheet-open");
+    setInert(true);
+    if (id === "plan") loadPlan();
+    var h = el.querySelector("h2");
+    h.setAttribute("tabindex", "-1");
+    h.focus();
+  }
+  function closeSheet(silent) {
+    if (!sheetOpen) return;
+    if (sheetOpen.id === "sheet-breathe") stopBreath(true);
+    sheetOpen.hidden = true;
+    sheetOpen = null;
+    document.documentElement.classList.remove("sheet-open");
+    setInert(false);
+    if (!silent && sheetReturn && document.contains(sheetReturn)) sheetReturn.focus();
+  }
+  function initSheets() {
+    document.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("[data-close]")) closeSheet();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && sheetOpen) { e.preventDefault(); closeSheet(); }
+    });
+  }
+
+  /* ---------- Breathe with me: 4 in, 6 out, six breaths, no holds ---------- */
+  var B = { running: false, t0: 0, acc: 0, raf: 0, total: 60000, lastSec: -1 };
+  function ease(x) { return 0.5 - 0.5 * Math.cos(Math.PI * x); }
+  function breathFrame() {
+    if (!B.running) return;
+    var el = B.acc + (performance.now() - B.t0);
+    if (el >= B.total) { finishBreath(); return; }
+    var cyc = el % 10000, inhale = cyc < 4000;
+    var f = inhale ? ease(cyc / 4000) : 1 - ease((cyc - 4000) / 6000);
+    if (motionOK()) {
+      var sun = $("bsun");
+      sun.style.setProperty("--grow", (0.78 + 0.22 * f).toFixed(4));
+      sun.style.setProperty("--rise", (18 - 40 * f).toFixed(2) + "%");
+    }
+    $("bbar").style.transform = "scaleX(" + (el / B.total).toFixed(4) + ")";
+    var sec = Math.floor(el / 1000);
+    if (sec !== B.lastSec) {
+      B.lastSec = sec;
+      var inCyc = Math.floor(cyc / 1000);
+      var word = inhale ? S("breathe.in") : S("breathe.out");
+      var n = inhale ? inCyc + 1 : inCyc - 3;
+      var txt = word;
+      for (var k = 2; k <= n; k++) txt += ", " + k;
+      $("bcount").textContent = txt;
+      $("bleft").textContent = fill(S("breathe.left"), { s: Math.ceil((B.total - el) / 1000) });
+    }
+    B.raf = requestAnimationFrame(breathFrame);
+  }
+  function setGo(play) {
+    var go = $("bgo");
+    go.querySelector("use").setAttribute("href", play ? "#i-play" : "#i-pause");
+    $("bgoT").textContent = play ? (B.acc > 0 ? S("breathe.resume") : S("breathe.start")) : S("breathe.pause");
+  }
+  function startBreath() {
+    $("bafter").hidden = true;
+    B.running = true; B.t0 = performance.now(); B.lastSec = -1;
+    setGo(false);
+    B.raf = requestAnimationFrame(breathFrame);
+  }
+  function pauseBreath() {
+    if (!B.running) return;
+    B.running = false; cancelAnimationFrame(B.raf);
+    B.acc += performance.now() - B.t0;
+    setGo(true);
+  }
+  function stopBreath(reset) {
+    B.running = false; cancelAnimationFrame(B.raf);
+    if (reset) {
+      B.acc = 0; B.lastSec = -1;
+      $("bbar").style.transform = "scaleX(0)";
+      $("bsun").style.removeProperty("--grow"); $("bsun").style.removeProperty("--rise");
+      $("bcount").textContent = S("breathe.ready"); $("bleft").textContent = "";
+      setGo(true);
+    }
+  }
+  function finishBreath() {
+    stopBreath(false);
+    B.acc = 0;
+    $("bbar").style.transform = "scaleX(1)";
+    $("bcount").textContent = S("breathe.out");
+    $("bleft").textContent = "";
+    setGo(true);
+    $("bdone").textContent = S("breathe.done");
+    $("bafter").hidden = false;
+    $("bdone").setAttribute("tabindex", "-1");
+    $("bdone").focus();
+  }
+  var G = { i: 0 };
+  function buildGround() {
+    var g = S("breathe.ground");
+    $("gsteps").innerHTML = g.map(function (x, k) {
+      return '<li class="' + (k === G.i ? "now" : k < G.i ? "past" : "") + '"' + (k === G.i ? ' aria-current="step"' : "") + ">" + esc(x) + "</li>";
+    }).join("");
+    $("gback").disabled = G.i === 0;
+  }
+  function initBreathe() {
+    $("bgo").addEventListener("click", function () { if (B.running) pauseBreath(); else startBreath(); });
+    $("bagain").addEventListener("click", function () {
+      $("bafter").hidden = true;
+      if ($("ground").hidden) { stopBreath(true); startBreath(); }
+      else { G.i = 0; buildGround(); }
+    });
+    var seg = document.querySelectorAll("#sheet-breathe .seg button");
+    for (var i = 0; i < seg.length; i++) seg[i].addEventListener("click", function () {
+      var mode = this.getAttribute("data-mode");
+      for (var k = 0; k < seg.length; k++) seg[k].setAttribute("aria-checked", String(seg[k] === this));
+      $("breath").hidden = mode !== "breath";
+      $("ground").hidden = mode !== "ground";
+      $("bafter").hidden = true;
+      stopBreath(true);
+      G.i = 0; buildGround();
+    });
+    $("gnext").addEventListener("click", function () {
+      var n = S("breathe.ground").length;
+      if (G.i < n - 1) { G.i++; buildGround(); }
+      else { $("bdone").textContent = S("breathe.groundDone"); $("bafter").hidden = false; $("bdone").setAttribute("tabindex", "-1"); $("bdone").focus(); }
+    });
+    $("gback").addEventListener("click", function () { if (G.i > 0) { G.i--; buildGround(); } });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) pauseBreath(); });
+  }
+
+  /* ---------- My safety plan: printed by default, saved only by choice ---------- */
+  var planMode = "print";
+  function store() { try { return window.localStorage; } catch (e) { return null; } }
+  function planData() {
+    var f = $("plan"), out = { v: 1, steps: [], lines: [] };
+    var tas = f.querySelectorAll("textarea");
+    for (var i = 0; i < tas.length; i++) out.steps.push(tas[i].value);
+    var cb = f.querySelectorAll("input[type=checkbox]:checked");
+    for (var k = 0; k < cb.length; k++) out.lines.push(cb[k].value);
+    return out;
+  }
+  function buildPlanForm() {
+    var f = $("plan"), keep = f.children.length ? planData() : null;
+    var steps = S("plan.steps");
+    f.innerHTML = steps.map(function (s, i) {
+      var id = "ps" + i, extra = "";
+      if (i === 4) {
+        extra = '<div class="checks">' + D.PLAN_LINES.map(function (lid) {
+          var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
+          return '<label class="check"><input type="checkbox" value="' + lid + '" /><span>' + esc(l.title) + (ph ? " <b>" + esc(displayNumber(ph.href)) + "</b>" : "") + "</span></label>";
+        }).join("") + "</div>";
       }
+      return '<fieldset><legend><b>' + (i + 1) + "</b><span>" + esc(s.t) + '</span></legend><p class="help" id="' + id + 'h">' + esc(s.h) + "</p>" + extra +
+        '<textarea id="' + id + '" aria-describedby="' + id + 'h" placeholder="' + esc(s.p) + '" rows="3"></textarea></fieldset>';
+    }).join("");
+    if (keep) fillPlan(keep);
+  }
+  function fillPlan(d) {
+    var tas = $("plan").querySelectorAll("textarea");
+    for (var i = 0; i < tas.length; i++) tas[i].value = (d.steps && d.steps[i]) || "";
+    var cb = $("plan").querySelectorAll("input[type=checkbox]");
+    for (var k = 0; k < cb.length; k++) cb[k].checked = !!(d.lines && d.lines.indexOf(cb[k].value) > -1);
+  }
+  function setPlanMode(mode, quiet) {
+    planMode = mode;
+    var radios = document.querySelectorAll("input[name=pmode]");
+    for (var i = 0; i < radios.length; i++) radios[i].checked = radios[i].value === mode;
+    $("pwarn").hidden = mode !== "save";
+    if (mode === "save") {
+      savePlan();
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+    }
+    if (!quiet) $("pstatus").textContent = mode === "save" ? S("plan.statusSaved") : S("plan.statusTemp");
+  }
+  function savePlan() {
+    if (planMode !== "save") return;
+    var s = store();
+    try { if (s) s.setItem(PLAN_KEY, JSON.stringify(planData())); } catch (e) {}
+  }
+  function loadPlan() {
+    var s = store(), raw = null;
+    try { raw = s ? s.getItem(PLAN_KEY) : null; } catch (e) {}
+    if (raw) {
+      try { fillPlan(JSON.parse(raw)); } catch (e) {}
+      setPlanMode("save", true);
+      $("pstatus").textContent = S("plan.statusSaved");
+    } else if (planMode !== "save") {
+      $("pstatus").textContent = S("plan.statusTemp");
+    }
+  }
+  function planPrintHTML() {
+    var d = planData(), steps = S("plan.steps");
+    var html = "<h1>" + esc(S("tools.plan.title")) + "</h1>";
+    steps.forEach(function (s, i) {
+      var txt = d.steps[i] || "";
+      if (i === 4 && d.lines.length) txt = d.lines.map(function (lid) {
+        var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
+        return l.title + (ph ? "  " + displayNumber(ph.href) : "");
+      }).join("\n") + (txt ? "\n" + txt : "");
+      html += "<h2>" + (i + 1) + ". " + esc(s.t) + "</h2>" + (txt ? "<p>" + esc(txt) + "</p>" : '<div class="blank"></div>');
+    });
+    html += '<p class="pp-foot">' + esc(S("plan.printFoot")) + "<br />" + esc(S("plan.credit")) + "</p>";
+    return html;
+  }
+  function printWith(cls) {
+    document.body.classList.remove("print-card", "print-plan", "print-wallet");
+    cls.forEach(function (c) { document.body.classList.add(c); });
+    window.print();
+  }
+  function planImage() {
+    var d = planData(), steps = S("plan.steps");
+    var W = 1080, pad = 72, c = document.createElement("canvas"), ctx = c.getContext("2d");
+    var font = '"Atkinson Next", system-ui, sans-serif', disp = '"Fraunces", Georgia, serif';
+    function wrap(text, size, weight, family, maxW) {
+      ctx.font = weight + " " + size + "px " + family;
+      var out = [];
+      String(text).split("\n").forEach(function (para) {
+        var words = para.split(/\s+/), line = "";
+        words.forEach(function (w) {
+          var test = line ? line + " " + w : w;
+          if (ctx.measureText(test).width > maxW && line) { out.push(line); line = w; } else line = test;
+        });
+        out.push(line);
+      });
+      return out;
+    }
+    var blocks = [{ lines: wrap(S("tools.plan.title"), 64, "500", disp, W - 2 * pad), size: 64, weight: "500", family: disp, lh: 76, gap: 28 }];
+    steps.forEach(function (s, i) {
+      var txt = d.steps[i] || "";
+      if (i === 4 && d.lines.length) txt = d.lines.map(function (lid) {
+        var r = BY_ID[lid], l = L(r), ph = l.actions.filter(function (a) { return /^(tel|sms):/.test(a.href); })[0];
+        return l.title + (ph ? "  " + displayNumber(ph.href) : "");
+      }).join("\n") + (txt ? "\n" + txt : "");
+      blocks.push({ lines: wrap((i + 1) + ". " + s.t, 34, "700", font, W - 2 * pad), size: 34, weight: "700", family: font, lh: 44, gap: 8 });
+      blocks.push({ lines: wrap(txt || " ", 32, "400", font, W - 2 * pad), size: 32, weight: "400", family: font, lh: 46, gap: 26, muted: !txt });
+    });
+    blocks.push({ lines: wrap(S("plan.printFoot"), 26, "400", font, W - 2 * pad), size: 26, weight: "400", family: font, lh: 36, gap: 0, foot: true });
+    var H = pad + 8;
+    blocks.forEach(function (b) { H += b.lines.length * b.lh + b.gap; });
+    H += pad;
+    c.width = W; c.height = H;
+    ctx.fillStyle = "#f6f2ea"; ctx.fillRect(0, 0, W, H);
+    var grad = ctx.createLinearGradient(0, 0, W, 0);
+    var sky = SKY ? SKY.palette(new Date()).stops : ["#273064", "#5a4f7e", "#d7917c", "#5a4f7e", "#273064"];
+    sky.forEach(function (col, i) { grad.addColorStop(i / 4, col); });
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 10);
+    var y = pad + 8;
+    blocks.forEach(function (b) {
+      ctx.font = b.weight + " " + b.size + "px " + b.family;
+      ctx.fillStyle = b.foot ? "#4b5650" : "#1a211d";
+      ctx.textBaseline = "top";
+      b.lines.forEach(function (ln) { ctx.fillText(ln, pad, y); y += b.lh; });
+      y += b.gap;
+    });
+    c.toBlob(function (blob) { if (blob) download(blob, S("plan.imageName")); }, "image/png");
+  }
+  function download(blob, name) {
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = name; a.rel = "noopener";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  function initPlan() {
+    var radios = document.querySelectorAll("input[name=pmode]");
+    for (var i = 0; i < radios.length; i++) radios[i].addEventListener("change", function () { setPlanMode(this.value); if (this.value === "print") clearStoredPlan(); });
+    var t = null;
+    $("plan").addEventListener("input", function () { clearTimeout(t); t = setTimeout(savePlan, 300); });
+    $("plan").addEventListener("change", savePlan);
+    $("pprint").addEventListener("click", function () { $("printplan").innerHTML = planPrintHTML(); printWith(["print-plan"]); });
+    $("pwallet").addEventListener("click", function () { $("printplan").innerHTML = planPrintHTML(); printWith(["print-plan", "print-wallet"]); });
+    $("pimage").addEventListener("click", function () {
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(planImage); else planImage();
+    });
+    $("pdelete").addEventListener("click", function () {
+      clearStoredPlan();
+      fillPlan({ steps: [], lines: [] });
+      setPlanMode("print", true);
+      $("pstatus").textContent = S("plan.deleted");
+    });
+  }
+  function clearStoredPlan() { var s = store(); try { if (s) s.removeItem(PLAN_KEY); } catch (e) {} }
+
+  /* ---------- Save key numbers: a vCard 3.0 file made on the device ---------- */
+  function buildNumbers() {
+    $("numlist").innerHTML = D.CONTACTS.map(function (c) {
+      return '<li><span>' + esc(c[state.lang]) + '</span><span class="n">' + esc(displayNumber("tel:" + c.tel.replace("+", ""))) + '</span><span class="d">' + esc(fr() ? c.noteFr : c.noteEn) + "</span></li>";
+    }).join("");
+  }
+  function vEsc(s) { return String(s).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n"); }
+  function vcard() {
+    return D.CONTACTS.map(function (c) {
+      var name = c[state.lang];
+      return ["BEGIN:VCARD", "VERSION:3.0", "N:;" + vEsc(name) + ";;;", "FN:" + vEsc(name), "TEL;TYPE=VOICE:" + c.tel,
+        "NOTE:" + vEsc((fr() ? c.noteFr : c.noteEn) + " h3lp.francobernal.ca"), "END:VCARD"].join("\r\n");
+    }).join("\r\n") + "\r\n";
+  }
+  function initNumbers() {
+    $("vcf").addEventListener("click", function () {
+      download(new Blob([vcard()], { type: "text/vcard;charset=utf-8" }), S("numbers.fileName"));
+      $("vcfdone").textContent = S("numbers.after");
     });
   }
 
-  /* ---------- Pocket card printing ---------- */
-  function initPocket() {
-    var btn = document.getElementById("printCard");
-    if (!btn) return;
-    function done() { document.body.classList.remove("print-card"); }
-    btn.addEventListener("click", function () {
-      document.body.classList.add("print-card");
-      window.addEventListener("afterprint", done, { once: true });
-      setTimeout(done, 4000);
-      window.print();
+  /* ---------- wallet card, report link, brand and skip link ---------- */
+  function initMisc() {
+    $("printCard").addEventListener("click", function () { printWith(["print-card"]); });
+    $("report").addEventListener("click", function () {
+      /* the address is assembled only when tapped, so it never sits in the page */
+      var u = atob("ZnJhbmNvYmVybmFsY2E="), d = atob("Z21haWwuY29t");
+      location.href = "mailto:" + u + "\u0040" + d + "?subject=" + encodeURIComponent(S("reportSubject"));
+    });
+    $("brand").addEventListener("click", function (e) {
+      e.preventDefault();
+      if (sheetOpen) closeSheet(true);
+      window.scrollTo({ top: 0, behavior: motionOK() ? "smooth" : "auto" });
+      $("h1").setAttribute("tabindex", "-1");
+      $("h1").focus({ preventScroll: true });
+    });
+    document.querySelector(".skip").addEventListener("click", function (e) {
+      e.preventDefault();
+      var q = $("q");
+      scrollToEl($("help"));
+      if (q) q.focus({ preventScroll: true });
+    });
+    $("lang").addEventListener("click", function () {
+      state.lang = fr() ? "en" : "fr";
+      applyLang();
+      syncURL();
+      renderPanel(false);
+      renderAnswer();
+      paintWeather();
     });
   }
 
-  /* ---------- Offline: register the service worker (device-local cache only) ---------- */
+  /* ---------- strip height drives the sheet offset and scroll padding ---------- */
+  function initStripSize() {
+    var strip = $("strip");
+    function set() { document.documentElement.style.setProperty("--strip-h", strip.offsetHeight + "px"); }
+    set();
+    if (window.ResizeObserver) new ResizeObserver(set).observe(strip);
+    else window.addEventListener("resize", set);
+  }
+
+  /* ---------- clocks: sky and open-now refresh each minute, paused when hidden ---------- */
+  function initClock() {
+    var timer = null;
+    function tick() { paintSky(); refreshStatus(); }
+    function start() { clearInterval(timer); timer = setInterval(tick, 60000); }
+    document.addEventListener("visibilitychange", function () { if (document.hidden) clearInterval(timer); else { tick(); start(); } });
+    start();
+  }
+
   function initOffline() {
-    if ("serviceWorker" in navigator) {
-      try { navigator.serviceWorker.register("sw.js"); } catch (e) {}
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
     }
   }
 
-  /* ---------- Quick exit: replace this page with the weather, no trace in Back ---------- */
-  function initQuickExit() {
-    var qe = document.getElementById("quickExit");
-    if (!qe) return;
-    qe.addEventListener("click", function () {
-      window.location.replace("https://www.theweathernetwork.com/ca");
+  /* ---------- start ---------- */
+  function boot() {
+    var routed = parseHash();
+    if (!routed) {
+      if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+      var nav = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+      if (/^fr\b/i.test(nav)) state.lang = "fr";
+    }
+    applyLang();
+    initStripSize();
+    initSearch();
+    initClicks();
+    initExit();
+    initSheets();
+    initBreathe();
+    initPlan();
+    initNumbers();
+    initMisc();
+    initClock();
+    initOffline();
+    if (state.view) renderPanel(false);
+    paintWeather();
+    window.addEventListener("hashchange", function () {
+      if (parseHash()) { applyLang(); renderPanel(true); paintWeather(); }
     });
   }
-
-  /* Tab rail turns to glass once it sticks to the top */
-  function initStuck() {
-    var tabs = document.querySelector(".tabs");
-    if (!tabs) return;
-    window.addEventListener("scroll", function () {
-      tabs.classList.toggle("stuck", tabs.getBoundingClientRect().top <= 0);
-    }, { passive: true });
-  }
-
-  /* ---------- Intro splash → site ---------- */
-  function initSplash() {
-    var splash = document.getElementById("splash");
-    var vid = document.getElementById("introVid");
-    var bar = document.getElementById("vidbar");
-    var skip = document.getElementById("skip");
-    var done = false, maxTimer;
-
-    function dismiss() {
-      if (done) return; done = true;
-      clearTimeout(maxTimer);
-      splash.classList.add("leaving");
-      document.body.classList.remove("intro");
-      document.body.classList.add("entered");
-      setTimeout(function () { try { vid.pause(); } catch (e) {} splash.style.display = "none"; }, 850);
-    }
-
-    skip.addEventListener("click", dismiss);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") dismiss(); });
-
-    if (vid) { vid.play().catch(function () {}); }
-    // The intro runs about four seconds, then glides into the site. Skip or Esc end it early.
-    if (bar) { bar.style.transition = "width 4s linear"; requestAnimationFrame(function () { bar.style.width = "100%"; }); }
-    maxTimer = setTimeout(dismiss, 4000);
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    document.body.classList.add("intro");
-    buildChrome();
-    if (location.hash) applyHash();
-    applyLang();
-    render();
-    initSplash();
-    initStuck();
-    initShare();
-    initQuickExit();
-    initPocket();
-    initOffline();
-    initLangToggle();
-    window.addEventListener("popstate", function () { applyHash(); applyLang(); render(); });
-  });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 })();

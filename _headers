@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'none'; connect-src 'self' https://api.open-meteo.com; manifest-src 'self'; worker-src 'self'
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
@@ -9,18 +9,15 @@
   Cross-Origin-Resource-Policy: same-origin
   X-Permitted-Cross-Domain-Policies: none
 
-# script-src is strict ('self', no 'unsafe-inline'): h3lp has zero inline
-# <script> blocks, and script-src is where XSS actually lives. Keep it strict.
-#
-# style-src DOES need 'unsafe-inline'. Verified by loading the deployed page:
-# site.js applies styles at runtime (setAttribute('style') / cssText), which
-# CSP blocks under a bare 'self', and the layout breaks. Inline styles are a
-# far smaller risk than inline scripts: they permit CSS injection, not code
-# execution. Do not "fix" this by removing 'unsafe-inline' without re-testing
-# the rendered page for CSP violations in the console.
+# script-src is strict ('self', no 'unsafe-inline'): h3lp has zero inline <script>.
+# style-src is strict too since the 2026-10 rebuild: no style="" attributes anywhere.
+# site.js sets custom properties through the CSSOM (style.setProperty), which CSP
+# allows. Re-test the console for CSP violations before loosening anything.
+# connect-src allows exactly one outside host: the Open-Meteo forecast for the city a
+# person picks. h3lp never sends anything about the visitor and never asks for location.
 
-# The service worker must never be cached hard, or users get stuck on an old
-# build with no way to update.
+# The service worker, the page and its data must never be cached hard: a corrected
+# phone number has to reach people on their next visit.
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
@@ -31,6 +28,24 @@
   Cache-Control: public, max-age=0, must-revalidate
 
 /manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+
+/data.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/site.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/intent.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/sky.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/site.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/nojs.css
   Cache-Control: public, max-age=0, must-revalidate
 
 /assets/*
