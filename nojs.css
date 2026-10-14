@@ -1,3 +1,4 @@
 /* Loaded only when JavaScript is off: hide the controls that need it. */
 .js-only { display: none !important; }
 .sbtn-exit .dots { display: none !important; }
+.lang { display: none !important; }
