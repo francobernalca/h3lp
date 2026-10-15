@@ -536,13 +536,22 @@
   function initExit() {
     var btn = $("exit"), live = $("shiftLive");
     btn.addEventListener("click", quickExit);
-    var presses = [], reset = null;
+    var presses = [], reset = null, bare = false;
     function paint() {
       btn.setAttribute("data-n", String(presses.length));
       btn.classList.toggle("armed", presses.length > 0);
     }
+    /* Only a Shift pressed and released on its own counts (the GOV.UK pattern). Shift held
+       for a capital letter never counts, and any other key starts the count again, so a
+       person typing "My Dad Hits Me" is never thrown out of the page. */
     document.addEventListener("keydown", function (e) {
-      if (e.key !== "Shift" || e.repeat) return;
+      if (e.key === "Shift") { if (!e.repeat) bare = true; return; }
+      bare = false;
+      if (presses.length) { presses = []; clearTimeout(reset); paint(); live.textContent = ""; }
+    }, true);
+    document.addEventListener("keyup", function (e) {
+      if (e.key !== "Shift" || !bare) return;
+      bare = false;
       var now = Date.now();
       presses = presses.filter(function (t) { return now - t < 5000; });
       presses.push(now);
