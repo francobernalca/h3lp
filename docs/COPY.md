@@ -273,7 +273,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | Key | English | French |
 |---|---|---|
 | nsLead | Search and tools need JavaScript, which is off. These free lines work any time: | La recherche et les outils ont besoin de JavaScript, qui est désactivé. Ces lignes gratuites fonctionnent en tout temps : |
-| ns211 | Full list of local services: 211ontario.ca | Liste complète des services locaux : 211ontario.ca/fr |
+| ns211 | Full list of local services: 211ontario.ca | Liste complète des services locaux : 211ontario.ca/recherche |
 
 ## Other
 
