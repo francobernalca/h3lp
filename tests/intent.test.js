@@ -27,7 +27,11 @@ const SELF = [
   "je veux mourir", "Je veux me suicider", "j'ai envie de mourir", "je pense au suicide", "je veux me tuer",
   "je veux en finir", "je veux plus vivre", "je ne veux plus vivre", "pas envie de vivre",
   "mettre fin à mes jours", "j'en peux plus", "je me fais du mal", "automutilation", "suicidaire",
-  "ils seraient mieux sans moi", "aucune raison de vivre", "jveux mourir"
+  "ils seraient mieux sans moi", "aucune raison de vivre", "jveux mourir",
+  /* found missing in the 2026-10-15 review */
+  "i just want it all to end", "I'm done with life", "what's the point of living", "nobody would miss me",
+  "I feel like dying", "i'm going to jump", "tonight is the night i end it", "i will end it", "I should end it",
+  "time to end it", "kys", "je me suis coupée", "j'ai des idées noires", "personne ne me manquerait"
 ];
 
 const OVERDOSE = [
@@ -43,7 +47,10 @@ const ABUSE = [
   "my boyfriend controls my money and hits me", "my grandson takes my money and hurts me", "being trafficked",
   "il me frappe", "mon mari me frappe", "je ne suis pas en sécurité chez moi", "violence conjugale",
   "j'ai peur de mon chum", "il menace de me tuer", "elle me fait mal", "j'ai été agressée", "maltraitance",
-  "I'm 14 and my mom hits me"
+  "I'm 14 and my mom hits me",
+  /* found missing in the 2026-10-15 review ("danger" was being corrected to "dinner") */
+  "I'm in danger", "I M IN DANGER", "im in dangr", "je suis en danger", "someone is following me",
+  "i was attacked", "I got jumped"
 ];
 
 const OTHERS = [
@@ -99,7 +106,9 @@ const CALM = [
   "food bank hours", "my phone died", "my phone battery is dead", "deadline for rent", "killing time before class",
   "is it safe to eat expired food", "the dying light", "I'm dying of hunger", "kids sports registration",
   "budget help", "rent is due friday", "how to get a lawyer", "job hunting", "dye my hair", "diet tips",
-  "je meurs de faim", "dead end job", "my dad hurt his back", "i ate too much", "how do i register for ODSP"
+  "je meurs de faim", "dead end job", "my dad hurt his back", "i ate too much", "how do i register for ODSP",
+  "this traffic is killing me", "traffic ticket", "I want to end it with him", "should I end it with my boyfriend",
+  "dinner tonight"
 ];
 
 function isSelfLed(r) { return (r.ids[0] === "988" || r.ids[0] === "911" || r.ids[1] === "988") && r.ids.includes("988"); }
@@ -177,6 +186,28 @@ test("everyday needs reach the right category without crisis framing", () => {
   assert.deepStrictEqual(fails, []);
 });
 
+/* Indirect wording, collected as unseen batches in the 2026-10-15 review. Any crisis
+   framing passes: the point is that none of these is ever treated as an everyday question. */
+const INDIRECT = [
+  "i want to sleep forever", "i dont see a way forward", "i am a burden to everyone", "im thinking of taking all my pills",
+  "bought a rope", "i have pills saved up", "i want to stop existing", "i shouldnt be alive", "i dont deserve to live",
+  "i cant take this pain anymore", "i think about dying every day", "i keep thinking about death",
+  "im not going to be around much longer", "this is my last night", "i gave away all my stuff",
+  "i want to go to sleep and not wake up", "i want to be gone", "i have a knife and i want to use it on myself",
+  "im so tired i just want to stop", "i looked up how many pills it takes", "whats the easiest way to go",
+  "i burned myself again", "i started cutting again", "i cant do life anymore", "my friend posted a goodbye note",
+  "someone broke into my house", "there is a man outside my door", "im being followed", "i was groped",
+  "he forced himself on me", "my husband locked me in", "he wont let me leave the house", "i was touched by my coach",
+  "je veux dormir pour toujours", "je suis un fardeau", "je ne mérite pas de vivre", "j'ai acheté une corde",
+  "je veux arrêter d'exister", "je pense à la mort tout le temps", "je veux que tout s'arrête", "c'est ma dernière nuit",
+  "je veux me faire mal", "il m'a frappée hier", "il m'a enfermée", "je me fais battre", "quelqu'un me suit"
+];
+
+test("indirect danger wording is never treated as an everyday question", () => {
+  const fails = INDIRECT.filter((q) => !I.match(q).crisis);
+  assert.deepStrictEqual(fails, []);
+});
+
 test("look-alike words never trigger crisis framing", () => {
   const fails = [];
   for (const q of CALM) if ((I.match(q).crisis) !== (false)) fails.push(`${q} -> ${I.match(q).crisis}`);
@@ -207,7 +238,7 @@ test("empty and noise input is calm", () => {
 
 test("phrase count", () => {
   const fails = [];
-  const n = SELF.length + OVERDOSE.length + ABUSE.length + OTHERS.length + SOMEONE.length + NEEDS.length + CALM.length;
+  const n = SELF.length + OVERDOSE.length + ABUSE.length + OTHERS.length + SOMEONE.length + NEEDS.length + CALM.length + INDIRECT.length;
   if (!(n >= 150)) fails.push(`only ${n} phrases`);
   console.log(`# ${n} phrases`);
   assert.deepStrictEqual(fails, []);

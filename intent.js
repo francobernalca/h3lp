@@ -52,7 +52,10 @@
     abuse: [
       new RegExp("\\b" + KIN + "\\b(?: \\w+){0,3} " + HURTS + " (me|us|my \\w+|mom|mother|sister|brother|kids|children)\\b"),
       new RegExp("\\b" + HURTS + " me\\b"),
-      /\b(being|been|getting|get|got|was|am|i am) (abused|hit|beaten|hurt|threatened|stalked|raped|assaulted|trafficked|choked|strangled|molested|groomed)\b/,
+      /\b(being|been|getting|get|got|was|am|i am) (abused|hit|beaten|hurt|threatened|stalked|raped|assaulted|trafficked|choked|strangled|molested|groomed|groped|touched|fondled)\b/,
+      /\b(locked|locks|locking) me (in|up)\b/, /\b(wont|will not|doesnt|does not|dont|do not) let me (leave|go out|go outside|see my|talk to|have my|call)\b/,
+      /\bme (fais|fait) (battre|frapper|agresser|violer|menacer|enfermer)\b/,
+      /\bforced (himself|herself|themselves) on me\b/, /\b(groped|grabbed) me\b/,
       new RegExp("\\b" + KIN + " (will|is going to|going to|said (he|she|they) would|threatened to|wants to|tried to|might) (kill|hurt) me\\b"),
       /\b(wants|tried|going|threatened) to kill me\b/,
       /\bnot safe\b(?! to (eat|drink|use|take|drive))/, /\b(feel|feeling|am|i am) unsafe\b/, /\bunsafe at home\b/,
@@ -66,7 +69,15 @@
       /\b(pas|plus|jamais) en securite\b/, /\b(pas|plus) securitaire\b/,
       /\bviolence (conjugale|familiale|sexuelle|domestique|physique)\b/, /\bagress\w*/, /\bviol(ee|e)?\b/,
       /\bmaltrait\w*/, /\babus\w*/, /\bpeur (de|pour) (lui|elle|eux|ma vie|mon (mari|conjoint|chum|copain|pere|ex)|ma (femme|conjointe|blonde|copine|mere))\b/,
-      /\bpeur de rentrer\b/, /\b(va|veut|menace de) me tuer\b/
+      /\bpeur de rentrer\b/, /\b(va|veut|menace de) me tuer\b/,
+      /\b(m a|ma) (frappe|frappee|battu|battue|viole|violee|agresse|agressee|menace|menacee|etrangle|etranglee|pousse|poussee|blesse|blessee|enferme|enfermee)\b/,
+      /\bin danger\b(?! of (failing|losing|missing|flunking|being late))/, /\ben danger\b/,
+      /\b(following|stalking|chasing) me\b(?! on (instagram|insta|twitter|x|tiktok|facebook|social|socials|youtube|twitch|snapchat|snap|linkedin))/,
+      /\b(being|been|getting|get|got|was|were|am|just) (attacked|jumped|mugged|robbed|stabbed|shot|kidnapped)\b/,
+      /\b(ete|fait|fais|suis) (attaque|attaquee|poignarde|poignardee|kidnappe|kidnappee)\b/,
+      /\b(being|been|getting) followed\b/, /\b(broke|breaking|broken|trying to get) in(to)? my (house|home|apartment|place|room)\b/,
+      /\b(someone|somebody|a man|a guy|a person|he|she|they) (is |are )?(outside|at|banging on) my (door|window|house|home)\b/,
+      /\bquelqu un (me suit|est entre|essaie d entrer|frappe a ma porte)\b/, /\b(est|sont) entres? chez moi\b/
     ],
     others: [
       new RegExp("\\b(want|going|planning|plan|thinking|urge|feel like|about|might|will|ready) (to )?(kill|hurt|harm|stab|shoot|beat up|murder) (him|her|them|someone|somebody|people|everyone|my " + PEOPLE + ")\\b"),
@@ -81,16 +92,40 @@
       /\bkill(ing|ed)? (my ?self|me ?self|meself)\b/, /\bkil (my ?self|me)\b/,
       /\b(hurt|hurting|harm|harming|cut|cutting|burn|burning|starve|starving|punish|punishing) (my ?self)\b/,
       /\bself (harm\w*|injur\w*|hurt\w*)\b/,
-      /\b(want|wanted|wanting|wish|going|ready|plan|planning|deserve|need|like) (to )?(die|be dead|disappear forever|not exist|not be here|not wake up|end it)\b/,
+      /\b(want|wanted|wanting|wish|going|ready|plan|planning|deserve|need|like) (to )?(die|be dead|disappear forever|not exist|not be here|not wake up|end it(?! (with|between|off)\b))\b/,
       /\b(i|i should|i could|i might|i will|let me|hope i|i hope i|i just want to|just want to) (die|be dead)\b/,
       /\b(better off|rather be|should be|wish i was|wish i were) dead\b/, /\bbetter off without me\b/,
       /\b(no|zero|not any|nothing) (reason|point|reasons) (to|in|for) (live|living|life|go on|going on|being alive|keep going|stay)\b/,
       /\b(do not|never|no longer|dont) (want|wanna) to (live|be alive|be here|exist|wake up|go on|keep going|keep living)\b/,
       /\b(can not|can t|could not|unable to) (go on|do this anymore|do this any more|take (it|this) (anymore|any more)|keep going|live like this|keep living|cope)\b/,
+      /\b(can not|can t|could not) take (the|this|my) pain (anymore|any more|much longer)\b/, /\b(not|never) wake up\b/,
+      /\b(not|wont|will not) (going to )?be (around|here) (much )?(longer|tomorrow)\b/, /\b(this is|tonight is) my last (night|day)\b/,
+      /\bgave away (all )?(my|of my) (stuff|things|belongings|possessions)\b/, /\b(want|wanna|wish) (to be|i was|i were) gone\b/,
+      /\b(knife|blade|razor|gun|rope|pills)\b.{0,30}\b(on|to|at) my ?self\b/, /\b(want|wanna) (everything|it all|all of it) to stop\b/,
+      /\b(burned|burnt) my ?self\b/, /\b(can not|can t) do (life|this life|living)\b/, /\b(started|start|been|keep|kept|back to) (cutting|burning|hurting)( my ?self)?\b/,
+      /\bjust want (it |everything |it all )?to stop$/, /\bhow many (pills|tablets|meds|sleeping pills|tylenol|advil)\b/,
+      /\b(easiest|painless|painlessly|quickest|fastest|best) way to (go|die|end it|end my life|kill)\b/,
+      /\b(me|m) faire mal\b/,
+      /\bque tout s ?arrete\b/, /\b(arreter|cesser) d ?exister\b/, /\b(ma|mon) derniere? (nuit|jour)\b/, /\bpense (a la mort|a mourir|au suicide)\b/,
       /\b(end|ending) (it all|my life|everything|myself|my own life)\b/, /\bending it\b/, /\btake my (own )?life\b/,
       /\b(not|isnt|is not) worth (living|it anymore)\b/, /\blife is (not|no longer) worth\b/,
       /\b(give|giving|gave) up on (life|living|everything)\b/, /\btired of (living|life|being alive|existing)\b/,
-      /\bno way out\b/, /\bhate my life\b/, /\bhate being alive\b/, /\bwant (it|this|everything) to (end|stop|be over)\b/,
+      /\bno way out\b/, /\bhate my life\b/, /\bhate being alive\b/, /\bwant (it|this|everything) (all )?to (end|stop|be over)\b/,
+      /\bend it\b(?! (with|between|off)\b)(?! for (us|him|her|them)\b)/, /\bkill (your ?self|urself|yourselves)\b/,
+      /\b(feel|feeling|felt) like (dying|death|i am dying|i want to die)\b/, /\bdone with (life|living|being alive|everything|it all)\b/,
+      /\b(what is|whats) the point (of|in) (living|life|being alive|going on|anything|trying|it all)\b/,
+      /\bno point (in |to )?(living|life|going on|being alive)\b/,
+      /\b(no one|nobody) (would|will|is going to|going to) (miss|notice|care)\b/,
+      /\b(going to|about to|want to|ready to|will) jump\b/,
+      /\b(sleep|sleeping) forever\b/, /\bnever wake up\b/, /\b(stop|quit) (existing|living|being alive)\b/,
+      /\b(wish i could|could just|just want to|want to just) disappear\b/,
+      /\b(should not|shouldnt|shouldn t) be (alive|here|living)\b/, /\b(do not|dont|never) deserve to (live|be alive|exist|be here)\b/,
+      /\b(am|im|i am|feel like|feel like i am|being) (a|such a|just a) burden\b/, /\bburden (to|on) (everyone|everybody|my family|them|you)\b/,
+      /\b(do not see a|dont see a|can not see a|cant see a|see no) (way forward|future|way out)\b/, /\bno way forward\b/, /\b(there is no|i have no) future\b/, /\bno future for me\b/,
+      /\b(bought|got|have|tied|found|made) a (rope|noose)\b/, /\bnoose\b/,
+      /\b(taking|take|swallow|swallowing|thinking of taking|going to take) all (of )?my (pills|meds|medication|medications|tablets)\b/,
+      /\b(pills|meds|medication|tablets) saved( up)?\b/, /\b(saving|saved|stockpil\w*|hoarding) (up )?(my )?(pills|meds|medication|tablets)\b/,
+      /\bgoodbye (note|letter|letters|video)\b/, /\b(wrote|writing|posted|left|leaving) (a )?goodbye\b/,
       /\bwant to disappear\b/, /\b(jump|jumping) (off|from|in front of)\b/, /\bhang(ing)? my ?self\b/,
       /\bwrote a (note|goodbye)\b/, /\bsaying goodbye to everyone\b/, /\bgoodbye forever\b/,
       /\b(veux|voudrais|veut|vais|envie de|pense a|penser a|pret a|prete a|aimerais) (mourir|crever|disparaitre|en finir|me tuer|me suicider|plus vivre|plus etre la)\b/,
@@ -98,7 +133,12 @@
       /\ben finir\b/, /\bje veux (plus|pas) vivre\b/, /\b(plus|pas) envie de vivre\b/, /\bmettre fin a (mes jours|ma vie)\b/,
       /\b(finir|en finir) avec (la vie|tout|ma vie)\b/, /\bj en peux plus\b/, /\bje n en peux plus\b/,
       /\bautomutil\w*/, /\bscarif\w*/, /\bmourir\b/, /\bpas de raison de vivre\b/, /\bmieux sans moi\b/,
-      /\bmieux mort(e)?\b/, /\b(aucune|plus de) raison de vivre\b/
+      /\bmieux mort(e)?\b/, /\b(aucune|plus de) raison de vivre\b/,
+      /\bje me suis (coupe|coupee|blesse|blessee|fait du mal|scarifie|scarifiee|mutile|mutilee)\b/, /\bidees noires\b/,
+      /\bpersonne ne (me manquerait|s en apercevrait|remarquerait|le remarquerait)\b/, /\b(manquerais|manquerai) a personne\b/,
+      /\bdormir pour (toujours|l eternite)\b/, /\bplus jamais me reveiller\b/, /\b(arreter|cesser) d exister\b/, /\bne plus exister\b/,
+      /\b(je suis|suis) un (fardeau|poids)\b/, /\b(merite|meritais) pas de vivre\b/, /\b(achete|trouve|j ai) une corde\b/,
+      /\b(garde|accumule|stocke) (mes )?(pilules|medicaments|comprimes)\b/
     ],
     someone: [
       /\b(him|her|them)self\b/, /\bthemselves\b/,
@@ -200,7 +240,9 @@
     Object.keys(DANGER).forEach(function (k) { DANGER[k].forEach(harvest); });
     TOPICS.forEach(function (t) { harvest(t.re); });
   })();
-  ["food", "rent", "debt", "meal", "sick", "drug", "loan", "cash", "visa", "bank"].forEach(function (w) { VOCAB[w] = true; });
+  /* real words that sit one typo away from a danger word and must stay themselves:
+     "traffic" is not "traffick", "danger" is not "dinner" */
+  ["food", "rent", "debt", "meal", "sick", "drug", "loan", "cash", "visa", "bank", "traffic", "danger"].forEach(function (w) { VOCAB[w] = true; });
   var VOCAB_LIST = Object.keys(VOCAB);
 
   /* Damerau-Levenshtein (optimal string alignment), stopping early past max. */
@@ -246,6 +288,19 @@
     return false;
   }
 
+  /* The safety net under the patterns: a person who talks about themselves and death in
+     words no pattern foresaw ("I think about dying every day") still gets 988 first.
+     Everyday uses ("my phone is dead", "dying of hunger", "deadline") are left alone. */
+  var DEATH_WORD = /\b(die|dying|death|dead|mourir|mort|morte|meurs)\b/;
+  var FIRST_PERSON = /\b(i|me|my|myself|je|j|moi|ma|mon|mes)\b/;
+  var DEATH_OK = new RegExp([
+    "\\b(dying|die|dead|meurs|mourir|mort|morte) (of|from|de|d) (hunger|thirst|laughter|laughing|boredom|embarrassment|faim|soif|rire|ennui)\\b",
+    "\\b(phone|battery|batterie|telephone|cell|car|laptop|computer|plant|plants)\\b.*\\bdead\\b",
+    "\\bdead (end|line|tired|serious|wrong|weight|lift|zone|lock|bolt|ringer|giveaway|battery)\\b",
+    "\\bdying (light|art)\\b", "\\bdie (hard|cast)\\b", "\\best morte?\\b", "\\bmort de rire\\b"
+  ].join("|"));
+  function softDeath(t) { return DEATH_WORD.test(t) && FIRST_PERSON.test(t) && !DEATH_OK.test(t); }
+
   var PINS = {
     overdose: ["911", "988", "connex"],
     others: ["911", "988"],
@@ -274,7 +329,7 @@
       return t.replace(/\bfood banks?\b/g, "foodbank").replace(/\bbanques? alimentaires?\b/g, "banquealimentaire");
     });
 
-    var self = anyMatch(DANGER.self, squashed);
+    var self = anyMatch(DANGER.self, squashed) || texts.some(softDeath);
     var od = anyMatch(DANGER.overdose, squashed);
     var abuse = anyMatch(DANGER.abuse, calm);
     var others = anyMatch(DANGER.others, texts);
