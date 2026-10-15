@@ -77,6 +77,9 @@
 <!-- sprite:end -->
 <a class="skip" href="#help" data-t="skip">Skip to help</a>
 
+<!-- The sky over Toronto right now, as a faint wash of light behind the top of the page (set by site.js from sky.js). -->
+<div class="sky-wash" aria-hidden="true"></div>
+
 <!-- Emergency strip: always on screen. The line on top is the sky over Toronto right now. -->
 <div class="strip" id="strip" role="region" aria-label="Emergency lines" data-ta="aria-label:stripLabel">
   <div class="horizon" aria-hidden="true"></div>
@@ -107,6 +110,7 @@
     <div class="hero-main">
       <h1 id="h1" data-t="h1">You don’t have to figure this out alone.</h1>
       <p class="lede" data-t="lede">Free help across Ontario, checked by hand. What you type here stays on this device.</p>
+      <p class="sos"><span data-t="sos.a">Thinking of suicide? Call or text</span> <b>988</b><span data-t="sos.b">, free, any hour. Someone in danger right now? Call</span> <b>911</b><span data-t="sos.c">.</span></p>
 
       <div class="search js-only" id="help" role="search">
         <label class="search-label" for="q" data-t="searchLabel">What’s going on?</label>
@@ -128,9 +132,9 @@
 
     <div class="hero-side js-only">
       <p class="label" data-t="chipsLabel">Or tap what fits</p>
-      <div class="chips" id="chips"></div>
+      <div class="chips" id="chips"><!-- chips:start --><button class="chip" type="button" data-sit="talk" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-talk"/></svg><span>I need to talk to someone</span></button><button class="chip" type="button" data-sit="unsafe" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-safe"/></svg><span>I’m not safe at home</span></button><button class="chip" type="button" data-sit="food" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-food"/></svg><span>No food today</span></button><button class="chip" type="button" data-sit="sleep" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-bed"/></svg><span>Nowhere to sleep tonight</span></button><button class="chip" type="button" data-sit="new" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-new"/></svg><span>New to Canada</span></button><button class="chip" type="button" data-sit="money" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-money"/></svg><span>Money trouble</span></button><!-- chips:end --></div>
       <p class="label" data-t="pathsLabel">Or start here</p>
-      <div class="paths" id="paths"></div>
+      <div class="paths" id="paths"><!-- paths:start --><button class="path hot" type="button" data-path="now" aria-pressed="false"><span class="path-ic"><svg class="i" aria-hidden="true"><use href="#i-lifebuoy"/></svg></span><span><span class="path-t">I need help right now</span><span class="path-s">Call or text, any hour</span></span><svg class="i" aria-hidden="true"><use href="#i-chevron"/></svg></button><button class="path" type="button" data-path="unsure" aria-pressed="false"><span class="path-ic"><svg class="i" aria-hidden="true"><use href="#i-compass"/></svg></span><span><span class="path-t">I’m not sure what I need</span><span class="path-s">One call to 211 covers almost anything</span></span><svg class="i" aria-hidden="true"><use href="#i-chevron"/></svg></button><button class="path" type="button" data-path="someone" aria-pressed="false"><span class="path-ic"><svg class="i" aria-hidden="true"><use href="#i-someone"/></svg></span><span><span class="path-t">I’m worried about someone</span><span class="path-s">How to help, and who can help you help</span></span><svg class="i" aria-hidden="true"><use href="#i-chevron"/></svg></button><!-- paths:end --></div>
     </div>
   </section>
 
@@ -139,13 +143,13 @@
   <section class="where wrap js-only" aria-labelledby="whereq">
     <div class="where-city">
       <h2 class="h-sm" id="whereq"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="whereq">Where are you?</span></h2>
-      <div class="select"><select id="city" aria-label="Choose your Ontario city" data-ta="aria-label:cityAria"></select><svg class="i" aria-hidden="true"><use href="#i-chevron"/></svg></div>
+      <div class="select"><select id="city" aria-label="Choose your Ontario city" data-ta="aria-label:cityAria"><!-- city:start --><option value="" selected>All of Ontario</option><option value="toronto">Toronto</option><option value="ottawa">Ottawa</option><option value="mississauga">Mississauga</option><option value="brampton">Brampton</option><option value="hamilton">Hamilton</option><option value="london">London</option><option value="markham">Markham</option><option value="vaughan">Vaughan</option><option value="richmond-hill">Richmond Hill</option><option value="scarborough">Scarborough</option><option value="oshawa">Oshawa</option><option value="kitchener">Kitchener</option><option value="waterloo">Waterloo</option><option value="cambridge">Cambridge</option><option value="windsor">Windsor</option><option value="kingston">Kingston</option><option value="greater-sudbury">Greater Sudbury</option><option value="thunder-bay">Thunder Bay</option><option value="barrie">Barrie</option><option value="guelph">Guelph</option><option value="st-catharines">St. Catharines</option><option value="niagara-falls">Niagara Falls</option><option value="oakville">Oakville</option><option value="burlington">Burlington</option><option value="north-bay">North Bay</option><option value="sault-ste-marie">Sault Ste. Marie</option><option value="peterborough">Peterborough</option><!-- city:end --></select><svg class="i" aria-hidden="true"><use href="#i-chevron"/></svg></div>
       <p class="note" data-t="cityNote">Your city changes the food listings and the weather check. Phone lines work anywhere in Ontario.</p>
       <div class="weather-slot" data-weather="main"></div>
     </div>
     <div class="where-browse">
       <h2 class="h-sm" id="browse" data-t="browseTitle">Browse by need</h2>
-      <div class="tiles" id="tiles"></div>
+      <div class="tiles" id="tiles"><!-- tiles:start --><button class="tile" type="button" data-tab="talk" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-talk"/></svg><span>Talk to someone</span></button><button class="tile" type="button" data-tab="food" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-food"/></svg><span>Food today</span></button><button class="tile" type="button" data-tab="safe" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-safe"/></svg><span>A safe place</span></button><button class="tile" type="button" data-tab="comm" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-community"/></svg><span>Community</span></button><button class="tile" type="button" data-tab="play" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-sport"/></svg><span>Sports for youth</span></button><button class="tile" type="button" data-tab="new" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-new"/></svg><span>New to Canada &amp; legal</span></button><button class="tile" type="button" data-tab="money" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-money"/></svg><span>Money basics</span></button><button class="tile" type="button" data-tab="all" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-compass"/></svg><span>Not sure</span></button><!-- tiles:end --></div>
     </div>
   </section>
 
@@ -201,7 +205,7 @@
       <p class="note js-only" data-t="reportSub">Opens your email app.</p>
     </div>
     <div class="foot-sky">
-      <p class="sky-line"><span class="sky-chip" aria-hidden="true"></span><span data-t="sky">The thin line at the top of the page follows the sky over Toronto right now.</span> <span id="sunrise"></span></p>
+      <p class="sky-line"><span class="sky-chip" aria-hidden="true"></span><span data-t="sky">The line and the light at the top of the page follow the sky over Toronto right now.</span> <span id="sunrise"></span></p>
       <p class="madeby" data-t="madeby">Made by a civilian, for all civilians</p>
       <p class="cred" data-t="cred">© 2026 Franco Bernal · Free forever · Proudly built in Ontario, Canada</p>
     </div>

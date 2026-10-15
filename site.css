@@ -5,7 +5,7 @@
 @font-face { font-family: "Fraunces"; src: url("assets/fonts/fraunces-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 
 :root {
-  --bg: #f6f2ea; --surface: #fcf9f3; --well: #eee8dc; --ink: #1a211d; --ink-2: #4b5650; --ink-3: #5f6a63;
+  --bg: #f6f2ea; --surface: #fcf9f3; --well: #eee8dc; --ink: #1a211d; --ink-2: #4b5650; --ink-3: #56605a;
   --line: rgba(26, 33, 29, .12); --line-2: rgba(26, 33, 29, .26); --field: #7d8680;
   --teal: #0b5e6e; --teal-hover: #084b58; --on-teal: #fff; --teal-ink: #0a5a69; --teal-tint: #e0ecec;
   --ember: #9c3f26; --ember-tint: #fbece4; --ember-line: rgba(156, 63, 38, .3);
@@ -17,6 +17,7 @@
   --sky: linear-gradient(90deg, #273064, #5a4f7e 20%, #d7917c 45%, #5a4f7e 70%, #273064);
   --sky-top: #273064; --sky-mid: #5a4f7e; --sky-glow: #d7917c; --sun: #efa77f;
   --sky-dim: 1;
+  --wash: var(--wash-l, none);
   --strip-h: 56px;
   --font: "Atkinson Next", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --display: "Fraunces", Georgia, "Times New Roman", serif;
@@ -35,6 +36,7 @@
     --focus: #8ccfda;
     --shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 14px 30px -22px rgba(0, 0, 0, .7);
     --sky-dim: .82;
+    --wash: var(--wash-d, none);
   }
 }
 
@@ -115,8 +117,23 @@ button { cursor: pointer; }
   background: var(--surface); color: var(--ink); font-weight: 700; font-size: 15px; letter-spacing: .02em;
 }
 
+/* ---------- The sky as light: the colours of the line at the top, carried down as a faint
+   wash behind the header and hero. Real state from sky.js (night is cool, sunrise is warm),
+   static, tinted without changing the paper's lightness, so it never adds glare. ---------- */
+.sky-wash {
+  position: absolute; top: 0; left: 0; right: 0; height: 640px; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0, transparent 28%, var(--bg) 100%), var(--wash, none);
+}
+@media (min-width: 1040px) { .sky-wash { height: 760px; } }
+
 /* ---------- Hero ---------- */
 .hero { display: grid; gap: 26px; padding-block: 6px 30px; }
+.sos {
+  margin: -8px 0 24px; padding-left: 12px; border-left: 2px solid var(--ember);
+  max-width: 44ch; font-size: 15px; line-height: 1.45; color: var(--ink-2);
+}
+.sos b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (min-width: 1040px) { .sos { display: none; } }
 h1 {
   margin: 10px 0 12px; font: 500 clamp(2.05rem, 1.35rem + 3.1vw, 3.75rem)/1.06 var(--display);
   letter-spacing: -.022em; text-wrap: balance; max-width: 15ch;
@@ -185,7 +202,7 @@ h1 {
 }
 
 /* ---------- Panel and cards ---------- */
-.panel { padding-block: 8px 44px; scroll-margin-top: calc(var(--strip-h) + 8px); outline: none; }
+.panel { padding-block: 8px 44px; outline: none; }
 .panel-head { border-top: 1px solid var(--line-2); padding-top: 28px; }
 .eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--teal-ink); }
 .panel h2 { margin: 0; font: 500 clamp(1.75rem, 1.2rem + 2.2vw, 2.6rem)/1.1 var(--display); letter-spacing: -.016em; text-wrap: balance; outline: none; }

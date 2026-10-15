@@ -97,12 +97,25 @@
   }
 
   /* ---------- the sky ---------- */
+  /* A sky colour as light on the paper: keep the paper's lightness and add only the sky's
+     hue (its difference from its own grey), so night reads cool and dawn warm, never darker. */
+  var PAPER = { l: [246, 242, 234], d: [15, 20, 26] };
+  function tint(hex, base, k) {
+    var c = [1, 3, 5].map(function (i) { return parseInt(hex.substr(i, 2), 16); });
+    var m = (c[0] + c[1] + c[2]) / 3;
+    return "rgb(" + [0, 1, 2].map(function (i) { return Math.max(0, Math.min(255, Math.round(base[i] + (c[i] - m) * k))); }).join(",") + ")";
+  }
+  function band(stops, g, f) {
+    return "linear-gradient(90deg," + f(stops[0]) + " 0%," + f(stops[1]) + " " + Math.max(g - 34, 1) + "%," + f(stops[2]) + " " + g + "%," + f(stops[3]) + " " + Math.min(g + 34, 99) + "%," + f(stops[4]) + " 100%)";
+  }
   function paintSky() {
     if (!SKY) return;
     var p = SKY.palette(new Date());
     var s = p.stops, g = p.glow;
     var root = document.documentElement.style;
-    root.setProperty("--sky", "linear-gradient(90deg," + s[0] + " 0%," + s[1] + " " + Math.max(g - 34, 1) + "%," + s[2] + " " + g + "%," + s[3] + " " + Math.min(g + 34, 99) + "%," + s[4] + " 100%)");
+    root.setProperty("--sky", band(s, g, function (x) { return x; }));
+    root.setProperty("--wash-l", band(s, g, function (x) { return tint(x, PAPER.l, 0.5); }));
+    root.setProperty("--wash-d", band(s, g, function (x) { return tint(x, PAPER.d, 0.4); }));
     root.setProperty("--sky-top", s[0]);
     root.setProperty("--sky-mid", s[1]);
     root.setProperty("--sky-glow", s[2]);

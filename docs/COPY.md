@@ -31,6 +31,9 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | langBtn | FR | EN |
 | langBtnLang | fr | en |
 | langBtnAria | Passer au français | Switch to English |
+| sos.a | Thinking of suicide? Call or text | Vous pensez au suicide? Appelez ou textez le |
+| sos.b | , free, any hour. Someone in danger right now? Call | , gratuit, à toute heure. Quelqu’un est en danger en ce moment? Composez le |
+| sos.c | . | . |
 | exitHelp | To leave fast, tap Exit at the top, or press Shift 3 times. | Pour partir vite, touchez Sortir en haut, ou appuyez 3 fois sur Maj. |
 | exitPrivacy | Quick exit does not clear your history. Use a private window if someone checks your phone. | La sortie rapide n’efface pas votre historique. Utilisez une fenêtre privée si quelqu’un vérifie votre téléphone. |
 
@@ -250,7 +253,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | report | Report a broken link | Signaler un lien brisé |
 | reportSub | Opens your email app. | Ouvre votre application courriel. |
 | reportSubject | h3lp: a link or number needs fixing | h3lp : un lien ou un numéro à corriger |
-| sky | The thin line at the top of the page follows the sky over Toronto right now. | La fine ligne en haut de la page suit le ciel de Toronto en ce moment. |
+| sky | The line and the light at the top of the page follow the sky over Toronto right now. | La ligne et la lumière en haut de la page suivent le ciel de Toronto en ce moment. |
 | sunrise | Next sunrise: {t}. | Prochain lever du soleil : {t}. |
 | danger | In immediate danger? Call 911. | En danger immédiat? Composez le 911. |
 | quote | “Reason remains bulletproof, even when written in code.” | « La raison reste à l’épreuve des balles, même écrite en code. » |
@@ -317,4 +320,4 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 ## Checks
 
 - Banned words and em dashes found: none.
-- Keys in English: 208; every key has a French twin.
+- Keys in English: 211; every key has a French twin.

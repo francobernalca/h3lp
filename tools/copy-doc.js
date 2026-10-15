@@ -17,7 +17,7 @@ function walk(a, b, p) {
 }
 walk(en, fr, "");
 const GROUPS = [
-  ["Page and emergency strip", /^(docTitle|metaDesc|skip|strip|call|text|exit|shift|brand|lang)/],
+  ["Page and emergency strip", /^(docTitle|metaDesc|skip|strip|sos|call|text|exit|shift|brand|lang)/],
   ["Hero, search and crisis lines", /^(h1|lede|search|result|noMatch|crisis|seeAll|chips|paths?Label)/],
   ["The three paths", /^(paths|whileYouWait|breatheLink)/],
   ["City, browse and cards", /^(whereq|cityNote|cityAria|browse|backTo|hint|say|status|days|copy|share|tag|scope|here)/],
