@@ -28,6 +28,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | shiftHint | or press Shift 3 times | ou appuyez 3 fois sur Maj |
 | shiftLive | Shift pressed {n} of 3 times | Touche Maj : {n} sur 3 |
 | brandAria | h3lp, back to the top | h3lp, retour en haut |
+| brandSub | A hub for hope & recovery | Un carrefour d’espoir et de rétablissement |
 | langBtn | FR | EN |
 | langBtnLang | fr | en |
 | langBtnAria | Passer au français | Switch to English |
@@ -319,4 +320,4 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 ## Checks
 
 - Banned words and em dashes found: none.
-- Keys in English: 210; every key has a French twin.
+- Keys in English: 211; every key has a French twin.

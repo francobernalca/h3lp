@@ -3,7 +3,7 @@
    their next visit, never a visit later), with the cached copy as the offline fallback.
    Fonts and images under /assets are immutable, so they are served from the cache.
    Only the site's own files are cached. Nothing about the visitor is stored. */
-var CACHE = "h3lp-v6-2026-10";
+var CACHE = "h3lp-v7-2026-10";
 var CORE = [
   "./", "index.html", "site.css", "nojs.css", "data.js", "intent.js", "sky.js", "site.js", "manifest.webmanifest",
   "assets/fonts/atkinson-next-v1.woff2", "assets/fonts/fraunces-500.woff2",

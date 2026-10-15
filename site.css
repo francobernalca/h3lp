@@ -19,6 +19,7 @@
   --sky-dim: 1;
   --wash: var(--wash-l, none);
   --strip-h: 56px;
+  --logo-ground: transparent; --logo-pad: 0px; --logo-nudge: -4px;
   --font: "Atkinson Next", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --display: "Fraunces", Georgia, "Times New Roman", serif;
   --gut: max(16px, env(safe-area-inset-left), env(safe-area-inset-right));
@@ -36,6 +37,7 @@
     --focus: #8ccfda;
     --shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 14px 30px -22px rgba(0, 0, 0, .7);
     --sky-dim: .82;
+    --logo-ground: #f3eee4; --logo-pad: 4px; --logo-nudge: 0px;
     --wash: var(--wash-d, none);
   }
 }
@@ -107,11 +109,18 @@ button { cursor: pointer; }
 
 /* ---------- Header ---------- */
 .top { display: flex; align-items: center; justify-content: space-between; padding-block: 12px 4px; }
-.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ink); text-decoration: none; border-radius: 10px; }
-.mark { width: 34px; height: 34px; margin-left: -3px; }
-.mark-sun { fill: var(--sun); stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
-.mark-line { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; }
-.wordmark { font: 500 31px/1 var(--display); letter-spacing: -.015em; padding-bottom: 2px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; min-width: 0; color: var(--ink); text-decoration: none; border-radius: 12px; }
+/* h3lp's own logo, the tiger and the people under the sun, exactly as drawn */
+.brand-logo { flex: none; box-sizing: border-box; width: 56px; height: 56px; margin-left: var(--logo-nudge); padding: var(--logo-pad); border-radius: 14px; background: var(--logo-ground); }
+.brand-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.wordmark { font: 500 30px/1 var(--display); letter-spacing: -.015em; }
+.brand-sub { font-size: 14px; line-height: 1.25; color: var(--ink-2); text-wrap: balance; }
+@media (min-width: 1040px) {
+  .brand { gap: 12px; }
+  .brand-logo { width: 80px; height: 80px; margin-left: calc(var(--logo-nudge) * 1.5); border-radius: 18px; padding: calc(var(--logo-pad) * 1.4); }
+  .wordmark { font-size: 34px; }
+  .brand-sub { font-size: 15px; }
+}
 .lang {
   min-width: 48px; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line-2);
   background: var(--surface); color: var(--ink); font-weight: 700; font-size: 15px; letter-spacing: .02em;
@@ -323,7 +332,7 @@ h1 {
 .foot p { margin: 0 0 12px; }
 .foot-grid { display: grid; gap: 30px; }
 .lockup { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.lockup img { flex: none; width: 80px; height: 80px; }
+.lockup img { flex: none; box-sizing: border-box; width: 80px; height: 80px; padding: calc(var(--logo-pad) * 1.4); border-radius: 18px; background: var(--logo-ground); }
 .lockup .h-sm { margin: 0; }
 .danger { font-weight: 700; color: var(--ink); }
 .foot .btn-quiet { margin-top: 2px; }
