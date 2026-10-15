@@ -325,12 +325,10 @@ h1 {
 .lockup { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 .lockup img { flex: none; width: 80px; height: 80px; }
 .lockup .h-sm { margin: 0; }
-.quote { margin: 4px 0 0 !important; font: 500 16px/1.4 var(--display); color: var(--ink); }
 .danger { font-weight: 700; color: var(--ink); }
 .foot .btn-quiet { margin-top: 2px; }
 .sky-line { color: var(--ink-2); }
 .sky-chip { display: inline-block; width: 32px; height: 4px; margin-right: 8px; border-radius: 2px; vertical-align: middle; background: var(--sky); opacity: var(--sky-dim); }
-.madeby { color: var(--ink); font-weight: 650; }
 .cred { font-size: 15px; }
 @media (min-width: 1040px) { .foot-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 3fr); gap: 56px; } }
 

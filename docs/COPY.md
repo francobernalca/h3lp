@@ -41,7 +41,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 
 | Key | English | French |
 |---|---|---|
-| h1 | You don’t have to figure this out alone. | Vous n’avez pas à traverser ça seul(e). |
+| h1 | You don’t have to figure this out alone. | Vous n’avez pas à traverser ça sans aide. |
 | lede | Free help across Ontario, checked by hand. What you type here stays on this device. | De l’aide gratuite partout en Ontario, vérifiée à la main. Ce que vous écrivez ici reste sur cet appareil. |
 | searchLabel | What’s going on? | Qu’est-ce qui se passe? |
 | searchPlaceholder | Say it in your own words | Dites-le dans vos mots |
@@ -93,8 +93,8 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | backToBrowse | Browse other needs | Parcourir d’autres besoins |
 | hintAll | {n} services in this list. Your city changes the food listings; phone lines work anywhere in Ontario. | {n} services dans cette liste. Votre ville change les ressources alimentaires; les lignes téléphoniques fonctionnent partout en Ontario. |
 | hintCity | {n} services in this list for {city}. Local food help comes first; phone lines work anywhere in Ontario. | {n} services dans cette liste pour {city}. L’aide alimentaire locale passe en premier; les lignes téléphoniques fonctionnent partout en Ontario. |
-| saySummary | Not sure what to say? Tap for opening lines | Vous ne savez pas quoi dire? Touchez pour des phrases d’ouverture |
-| sayReassure | You don’t need the right words. They’re trained to carry the conversation from there. | Vous n’avez pas besoin des mots parfaits. Ces personnes sont formées pour porter la conversation à partir de là. |
+| saySummary | Not sure what to say? Tap for opening lines | Vous ne savez pas quoi dire? Touchez pour voir comment commencer |
+| sayReassure | You don’t need the right words. They’re trained to carry the conversation from there. | Vous n’avez pas besoin des mots parfaits. Ces personnes sont formées pour prendre le relais à partir de là. |
 | status.always | 24/7 | 24/7 |
 | status.open | Open now, until {t} | Ouvert jusqu’à {t} |
 | status.opens | Opens {t} | Ouvre à {t} |
@@ -156,15 +156,16 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | breathe.label | While you wait, or before you call. This does not replace talking to someone. | En attendant, ou avant d’appeler. Cela ne remplace pas une conversation avec quelqu’un. |
 | breathe.modeBreath | Slow breathing | Respiration lente |
 | breathe.modeGround | 5-4-3-2-1 grounding | Ancrage 5-4-3-2-1 |
-| breathe.caution | Breathe gently, do not force it. Stop if you feel dizzy. | Respirez doucement, sans forcer. Arrêtez si vous avez un étourdissement. |
+| breathe.caution | Breathe gently, do not force it. Stop if you feel dizzy. | Respirez doucement, sans forcer. Arrêtez si la tête vous tourne. |
 | breathe.start | Start, one minute | Commencer, une minute |
 | breathe.pause | Pause | Pause |
 | breathe.resume | Continue | Continuer |
 | breathe.again | Again | Recommencer |
-| breathe.ready | Sit or stand however is comfortable. Breathe in for 4, out for 6. | Assis ou debout, comme vous êtes bien. Inspirez sur 4, expirez sur 6. |
+| breathe.ready | Sit or stand however is comfortable. Breathe in for 4, out for 6. | En position assise ou debout, comme vous préférez. Inspirez sur 4, expirez sur 6. |
 | breathe.in | Breathe in | Inspirez |
 | breathe.out | Breathe out | Expirez |
 | breathe.left | {s} seconds left | Encore {s} secondes |
+| breathe.left1 | 1 second left | Encore 1 seconde |
 | breathe.done | That was one minute. How do you feel? You can still talk to someone, any time. | C’était une minute. Comment vous sentez-vous? Vous pouvez toujours parler à quelqu’un, à toute heure. |
 | breathe.groundIntro | Keep your eyes open. Look around and name, out loud or in your head: | Gardez les yeux ouverts. Regardez autour de vous et nommez, à voix haute ou dans votre tête : |
 | breathe.ground.1 | 5 things you can see | 5 choses que vous voyez |
@@ -222,7 +223,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 
 | Key | English | French |
 |---|---|---|
-| numbers.lead | Adds these free lines to your phone’s contacts. The file is made on this device; nothing is sent. | Ajoute ces lignes gratuites aux contacts de votre téléphone. Le fichier est créé sur cet appareil; rien n’est envoyé. |
+| numbers.lead | Adds these free lines to your phone’s contacts. The file is made on this device; nothing is sent. | Ajoutez ces lignes gratuites aux contacts de votre téléphone. Le fichier est créé sur cet appareil; rien n’est envoyé. |
 | numbers.save | Save to contacts | Ajouter aux contacts |
 | numbers.after | Open the downloaded file to add them to your contacts. | Ouvrez le fichier téléchargé pour les ajouter à vos contacts. |
 | numbers.fileName | h3lp-key-numbers.vcf | h3lp-numeros-cles.vcf |
@@ -256,8 +257,6 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | sky | The line and the light at the top of the page follow the sky over Toronto right now. | La ligne et la lumière en haut de la page suivent le ciel de Toronto en ce moment. |
 | sunrise | Next sunrise: {t}. | Prochain lever du soleil : {t}. |
 | danger | In immediate danger? Call 911. | En danger immédiat? Composez le 911. |
-| quote | “Reason remains bulletproof, even when written in code.” | « La raison reste à l’épreuve des balles, même écrite en code. » |
-| madeby | Made by a civilian, for all civilians | Fait par un civil, pour tous les civils |
 | cred | © 2026 Franco Bernal · Free forever · Proudly built in Ontario, Canada | © 2026 Franco Bernal · Gratuit pour toujours · Fièrement conçu en Ontario, au Canada |
 
 ## 404 page
@@ -320,4 +319,4 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 ## Checks
 
 - Banned words and em dashes found: none.
-- Keys in English: 211; every key has a French twin.
+- Keys in English: 210; every key has a French twin.

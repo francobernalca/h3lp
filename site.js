@@ -642,7 +642,8 @@
       var txt = word;
       for (var k = 2; k <= n; k++) txt += ", " + k;
       $("bcount").textContent = txt;
-      $("bleft").textContent = fill(S("breathe.left"), { s: Math.ceil((B.total - el) / 1000) });
+      var secs = Math.ceil((B.total - el) / 1000);
+      $("bleft").textContent = fill(S(secs === 1 ? "breathe.left1" : "breathe.left"), { s: secs });
     }
     B.raf = requestAnimationFrame(breathFrame);
   }
