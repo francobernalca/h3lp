@@ -1,0 +1,4 @@
+Contact: https://francobernal.ca/#contact
+Expires: 2027-10-30T00:00:00.000Z
+Preferred-Languages: en, es
+Canonical: https://h3lp.ca/.well-known/security.txt
