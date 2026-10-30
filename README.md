@@ -30,7 +30,7 @@ number and link checked by hand.
 
 ## Keeping it honest
 Phone numbers and links were verified when the page was built (June 2026, re-verified and
-audited July 2026, including the French edition). Click through them now and then and fix
+audited July 2026, including the French edition; re-audited October 2026). Click through them now and then and fix
 anything that has changed. Every service lives in `data.js`, in the `R` list: each entry is
 one card with a `title`, `body` and `actions` (`tel:`, `sms:` or `https:`), plus a `fr`
 block. Confirm any local detail by calling **211** before you rely on it.

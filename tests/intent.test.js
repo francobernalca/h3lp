@@ -50,7 +50,9 @@ const ABUSE = [
   "I'm 14 and my mom hits me",
   /* found missing in the 2026-10-15 review ("danger" was being corrected to "dinner") */
   "I'm in danger", "I M IN DANGER", "im in dangr", "je suis en danger", "someone is following me",
-  "i was attacked", "I got jumped"
+  "i was attacked", "I got jumped",
+  /* found missing in the 2026-10-29 audit */
+  "i have a stalker", "my ex is a stalker"
 ];
 
 const OTHERS = [
@@ -98,7 +100,11 @@ const NEEDS = [
   ["lost my job", "money"], ["I don't know what I need", "all", "211"], ["not sure", "all", "211"],
   ["je ne sais pas", "all", "211"], ["211", "all", "211"], ["988", "talk", "988"], ["call 811", "talk", "811"],
   ["seniors", "safe", "ssl"], ["my grandma needs help", "safe", "ssl"], ["worried about my son", "talk", "988"],
-  ["how can i help my friend", "talk"]
+  ["how can i help my friend", "talk"],
+  /* found misrouted in the 2026-10-29 audit */
+  ["eating disorder", "talk", "dco"], ["binge eating", "talk", "dco"], ["i feel ill", "talk", "811"],
+  ["my husband is controlling and checks my phone", "safe", "awhl"], ["coercive control", "safe", "awhl"],
+  ["i'm 80 and my daughter took my bank card", "safe", "ssl"], ["mon chum est très contrôlant", "safe", "awhl"], ["j'ai 78 ans et mon fils prend mon argent", "safe", "ssl"]
 ];
 
 /* ---------- Words that look dangerous but are not ---------- */
@@ -233,6 +239,22 @@ test("empty and noise input is calm", () => {
     const r = I.match(q);
     assert.strictEqual(r.crisis, false);
   }
+  assert.deepStrictEqual(fails, []);
+});
+
+/* Words one typo from another topic must keep their own meaning (2026-10-29 audit) */
+test("near-miss words do not pull in the wrong help", () => {
+  const fails = [];
+  const panic = I.match("panic attack right now");
+  if (panic.ids.includes("legalaid")) fails.push(`"right" read as "rights": ${panic.ids.join(",")}`);
+  if (I.match("right now i need food").tabs.includes("legal")) fails.push("right now i need food -> legal");
+  for (const q of ["eating disorder", "binge eating", "i have an eating disorder"]) {
+    const r = I.match(q);
+    if (r.tabs.includes("food") || r.ids.includes("211food")) fails.push(`${q} -> food: ${r.ids.join(",")}`);
+  }
+  if (I.match("i'm 80 and my daughter took my bank card").ids[0] !== "ssl") fails.push("senior money control: ssl not first");
+  for (const q of ["i feel ill", "im ill", "mentally ill"]) if (I.match(q).empty) fails.push(`${q} -> empty`);
+  for (const q of ["ill be fine", "ill call tomorrow"]) if (I.match(q).crisis) fails.push(`${q} -> crisis`);
   assert.deepStrictEqual(fails, []);
 });
 

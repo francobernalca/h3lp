@@ -34,6 +34,9 @@
     s = s.replace(/'/g, " ");                                      /* j'ai -> j ai, l'aide -> l aide */
     s = s.replace(/[^a-z0-9]+/g, " ").trim();
     s = s.replace(/([a-z])\1{2,}/g, "$1$1");                       /* hellllp -> hellp */
+    /* "ill" is slang for "I'll", except after words that make it mean sick */
+    s = s.replace(/\bmentally ill\b/g, "mental health")
+      .replace(/\b(feel|feeling|feels|felt|am|im|is|was|been|being|so|very|really|terminally|seriously|chronically|got|getting|gets|fell|falling|became|become) ill\b/g, "$1 sick");
     if (!s) return "";
     return s.split(" ").map(function (w) { return SLANG.hasOwnProperty(w) ? SLANG[w] : w; }).join(" ");
   }
@@ -75,7 +78,7 @@
       /\b(following|stalking|chasing) me\b(?! on (instagram|insta|twitter|x|tiktok|facebook|social|socials|youtube|twitch|snapchat|snap|linkedin))/,
       /\b(being|been|getting|get|got|was|were|am|just) (attacked|jumped|mugged|robbed|stabbed|shot|kidnapped)\b/,
       /\b(ete|fait|fais|suis) (attaque|attaquee|poignarde|poignardee|kidnappe|kidnappee)\b/,
-      /\b(being|been|getting) followed\b/, /\b(broke|breaking|broken|trying to get) in(to)? my (house|home|apartment|place|room)\b/,
+      /\b(being|been|getting) followed\b/, /\b(a|my|have a|got a|there is a|theres a) stalker\b/,/\b(broke|breaking|broken|trying to get) in(to)? my (house|home|apartment|place|room)\b/,
       /\b(someone|somebody|a man|a guy|a person|he|she|they) (is |are )?(outside|at|banging on) my (door|window|house|home)\b/,
       /\bquelqu un (me suit|est entre|essaie d entrer|frappe a ma porte)\b/, /\b(est|sont) entres? chez moi\b/
     ],
@@ -160,7 +163,7 @@
     { id: "addiction", tabs: ["talk", "comm"], ids: ["connex", "recovery", "811"], w: 3,
       re: /\b(substances?|substance use|recovery|recovering|retablissement|drugs?|drinking|drink too much|alcohol\w*|drunk|addict\w*|gambl\w*|betting|casino|sober|sobriety|relapse\w*|withdraw\w*|detox|rehab|opioids?|fentanyl|meth|crack|cocaine|heroin|weed|cannabis|high all the time|using again|aa meeting|na meeting|drogues?|alcool\w*|dependan\w*|jeux d argent|sobre|sobriete|rechute|desintox\w*|consommation)\b/ },
     { id: "eating", tabs: ["talk"], ids: ["811", "khp", "dco"], w: 3,
-      re: /\b(eating disorder|anorexi\w*|bulimi\w*|binge\w*|purging|trouble alimentaire|troubles alimentaires)\b/ },
+      re: /\b(eating disorder|eatingdisorder|anorexi\w*|bulimi\w*|binge\w*|purging|trouble alimentaire|troubles alimentaires)\b/ },
     { id: "health", tabs: ["talk"], ids: ["811"], w: 2,
       re: /\b(nurse|sick|fever|medication|medicine|prescription|symptoms?|in pain|chronic pain|injur\w*|health|doctor|pregnan\w*|infirmier\w*|infirmiere|malade|medicament\w*|sante|docteur|medecin|enceinte|douleurs?|blessure|health ?811|telehealth|sante ?811|hospital|hopital|emergency room)\b/ },
     { id: "youth", tabs: ["talk"], ids: ["khp"], w: 2,
@@ -179,6 +182,9 @@
       re: /\b(spanish|espanol|hispan\w*|latin[oax]|latine|ayuda|necesito|comida|hablo|ayudame|mujer|violencia)\b/ },
     { id: "senior", tabs: ["safe", "talk"], ids: ["ssl", "811"], w: 3,
       re: /\b(senior|seniors|elder|elderly|older adult|older person|grandma|grandpa|grandmother|grandfather|grandson|granddaughter|grandchildren|grandkids|retired|pension|aine|aines|aine?e?s?|personnes? agee?s?|grand mere|grand pere|petit fils|petite fille|petits enfants|retraite)\b/ },
+    /* control without a hit: partner control, phone checking, family taking your money */
+    { id: "control", tabs: ["safe"], ids: ["awhl", "211safe"], w: 4,
+      re: /\b(coercive(ly)? control\w*|controlling (husband|wife|partner|spouse|boyfriend|girlfriend|relationship|ex)|(husband|wife|partner|spouse|boyfriend|girlfriend|ex|he|she) (is )?(so |very |really |too )?(controlling|possessive)|(checks|tracks|reads|monitors|goes through|go through|went through) my (phone|texts|messages|location|emails?|accounts?)|(husband|wife|partner|spouse|boyfriend|girlfriend|ex|son|daughter|grandson|granddaughter|nephew|niece|brother|sister|caregiver|family|mom|mother|dad|father|stepdad|stepmom)(?: \w+){0,5} (took|takes|taking|stole|steals|stealing|keeps|kept|cashes|cashed) my (bank card|debit card|credit card|money|pension|cheques?|paycheques?|benefits|savings|passport|id|documents)|isolat\w* me|controle mon argent|(fils|fille|mari|femme|famille|neveu|niece|chum|conjoint|conjointe|frere|soeur|aidant|aidante|petit fils|petite fille)(?: \w+){0,4} (prend|prennent|a pris|ont pris|vole|volent|a vole|ont vole|garde|gardent|encaisse) (mon argent|ma carte|ma carte bancaire|ma carte de debit|ma pension|mes cheques|mes economies|mon passeport)|(il|elle|chum|blonde|mari|femme|conjoint|conjointe|partenaire|copain|copine|ex) est (tres |trop |super )?(controlant|controlante|possessif|possessive|jaloux|jalouse))\b/ },
     { id: "farmer", tabs: ["comm"], ids: ["farmer"], w: 4,
       re: /\b(farm|farmer|farmers|farming|rural|crops?|livestock|agricultur\w*|ferme|fermier\w*|agricult\w*|rurale?)\b/ },
     { id: "food", tabs: ["food"], ids: ["211food", "feedon"], w: 3,
@@ -241,8 +247,8 @@
     TOPICS.forEach(function (t) { harvest(t.re); });
   })();
   /* real words that sit one typo away from a danger word and must stay themselves:
-     "traffic" is not "traffick", "danger" is not "dinner" */
-  ["food", "rent", "debt", "meal", "sick", "drug", "loan", "cash", "visa", "bank", "traffic", "danger"].forEach(function (w) { VOCAB[w] = true; });
+     "traffic" is not "traffick", "danger" is not "dinner", "right" (now) is not "rights" */
+  ["food", "rent", "debt", "meal", "sick", "drug", "loan", "cash", "visa", "bank", "traffic", "danger", "right"].forEach(function (w) { VOCAB[w] = true; });
   var VOCAB_LIST = Object.keys(VOCAB);
 
   /* Damerau-Levenshtein (optimal string alignment), stopping early past max. */
@@ -326,7 +332,7 @@
     /* the squashed form catches "kill my self" typed as one word, or "su icide" */
     var squashed = texts.concat([norm.replace(/ /g, "")]);
     var topicTexts = texts.map(function (t) {
-      return t.replace(/\bfood banks?\b/g, "foodbank").replace(/\bbanques? alimentaires?\b/g, "banquealimentaire");
+      return t.replace(/\bfood banks?\b/g, "foodbank").replace(/\beating disorders?\b/g, "eatingdisorder").replace(/\b(binge|binging|bingeing) eating\b/g, "binge").replace(/\bbanques? alimentaires?\b/g, "banquealimentaire");
     });
 
     var self = anyMatch(DANGER.self, squashed) || texts.some(softDeath);
@@ -352,7 +358,9 @@
     function addId(id) { if (ids.indexOf(id) === -1) ids.push(id); }
     function addTab(id) { if (id && tabs.indexOf(id) === -1) tabs.push(id); }
     var topicIds = scored.map(function (x) { return x.t.id; });
-    var youth = topicIds.indexOf("youth") > -1, senior = topicIds.indexOf("senior") > -1;
+    var youth = topicIds.indexOf("youth") > -1, senior = topicIds.indexOf("senior") > -1 ||
+      /* an age of 65+ only steers abuse and money-control help to the Seniors Safety Line */
+      texts.some(function (t) { return /\b(i am|j ai) (6[5-9]|[7-9][0-9]|1[01][0-9])\b|\b(6[5-9]|[7-9][0-9]|1[01][0-9]) (years old|ans)\b/.test(t); });
 
     if (out.crisis) {
       var pins = PINS[out.crisis].slice();
@@ -364,6 +372,8 @@
       pins.forEach(addId);
       if (out.crisis !== "abuse") addTab("talk");
     }
+    /* an older person whose family takes their money: the Seniors Safety Line first */
+    if (!out.crisis && senior && topicIds.indexOf("control") > -1) addId("ssl");
     scored.forEach(function (x) {
       /* during abuse, the food or shelter words still count, but never push a crisis pin down */
       x.t.ids.forEach(addId);

@@ -114,7 +114,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | shared | Link copied | Lien copié |
 | shareSuffix | free, verified help via h3lp | aide gratuite et vérifiée via h3lp |
 | tagLocal | Local · confirm hours with 211 | Local · confirmez les heures au 211 |
-| tagChecked | Checked July 2026 | Vérifié en juillet 2026 |
+| tagChecked | Checked October 2026 | Vérifié en octobre 2026 |
 | tagIn | In {city} | À {city} |
 | scope.on | Anywhere in Ontario | Partout en Ontario |
 | scope.ca | Across Canada | Partout au Canada |
@@ -281,7 +281,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | Key | English | French |
 |---|---|---|
 | copied | Copied | Copié |
-| facts.checked | Every number checked by hand, July 2026 | Chaque numéro vérifié à la main, juillet 2026 |
+| facts.checked | Every number checked by hand, October 2026 | Chaque numéro vérifié à la main, octobre 2026 |
 | facts.lang | English and French | Français et anglais |
 | facts.offline | Works offline after your first visit | Fonctionne hors ligne après votre première visite |
 
