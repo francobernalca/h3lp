@@ -5,7 +5,7 @@ Someone to talk to, a meal today, a safe place, community, free youth sports, ne
 legal support, and money basics. English and French. No sign-up. No tracking. Made by a
 civilian, for all civilians.
 
-Live site: https://h3lp.francobernal.ca
+Live site: https://h3lp.ca (also at https://h3lp.francobernal.ca)
 
 ## What it is
 h3lp is one calm page. The emergency lines (988, 911) and a Quick exit stay on screen at all

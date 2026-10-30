@@ -500,7 +500,8 @@
     var r = BY_ID[id]; if (!r) return;
     var l = L(r), first = l.actions[0];
     var text = l.title + " · " + first.label + " · " + S("shareSuffix");
-    var url = location.origin + location.pathname + (fr() ? "#fr" : "");
+    /* always share the official address, whichever address this page was opened on */
+    var url = "https://h3lp.ca/" + (fr() ? "#fr" : "");
     if (navigator.share) navigator.share({ title: "h3lp", text: text, url: url }).catch(function () {});
     else copyText(text + " " + url, btn, S("shared"));
   }
@@ -887,7 +888,7 @@
     return D.CONTACTS.map(function (c) {
       var name = c[state.lang];
       return ["BEGIN:VCARD", "VERSION:3.0", "N:;" + vEsc(name) + ";;;", "FN:" + vEsc(name), "TEL;TYPE=VOICE:" + c.tel,
-        "NOTE:" + vEsc((fr() ? c.noteFr : c.noteEn) + " h3lp.francobernal.ca"), "END:VCARD"].join("\r\n");
+        "NOTE:" + vEsc((fr() ? c.noteFr : c.noteEn) + " h3lp.ca"), "END:VCARD"].join("\r\n");
     }).join("\r\n") + "\r\n";
   }
   function initNumbers() {

@@ -218,7 +218,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | plan.printWallet | Print wallet size | Imprimer en format portefeuille |
 | plan.saveImage | Save as image | Enregistrer en image |
 | plan.imageName | my-safety-plan.png | mon-plan-de-securite.png |
-| plan.printFoot | In danger right now? Call 911. Call or text 988 any time. h3lp.francobernal.ca | En danger immédiat? Appelez le 911. Appelez ou textez le 988 à toute heure. h3lp.francobernal.ca |
+| plan.printFoot | In danger right now? Call 911. Call or text 988 any time. h3lp.ca | En danger immédiat? Appelez le 911. Appelez ou textez le 988 à toute heure. h3lp.ca |
 
 ## Save key numbers
 
@@ -242,7 +242,7 @@ Not published. For review: plain language, reading age about 10, safe messaging 
 | pcConnex | ConnexOntario: addiction & mental health, 24/7 | ConnexOntario : dépendances et santé mentale, 24/7 |
 | pcAWHL | Assaulted Women's Helpline, 24/7 | Assaulted Women's Helpline (violence conjugale), 24/7 |
 | pcSSL | Seniors Safety Line, 24/7 | Ligne d'assistance aux personnes âgées, 24/7 |
-| pcFoot | All lines are free and confidential. More help: h3lp.francobernal.ca | Toutes ces lignes sont gratuites et confidentielles. Plus d’aide : h3lp.francobernal.ca |
+| pcFoot | All lines are free and confidential. More help: h3lp.ca | Toutes ces lignes sont gratuites et confidentielles. Plus d’aide : h3lp.ca |
 
 ## Footer
 

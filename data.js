@@ -309,7 +309,7 @@
         del: "Delete my plan", deleted: "Your plan was deleted from this device.",
         printFull: "Print full page", printWallet: "Print wallet size", saveImage: "Save as image",
         imageName: "my-safety-plan.png",
-        printFoot: "In danger right now? Call 911. Call or text 988 any time. h3lp.francobernal.ca"
+        printFoot: "In danger right now? Call 911. Call or text 988 any time. h3lp.ca"
       },
       numbers: {
         lead: "Adds these free lines to your phone’s contacts. The file is made on this device; nothing is sent.",
@@ -325,7 +325,7 @@
       pcConnex: "ConnexOntario: addiction & mental health, 24/7",
       pcAWHL: "Assaulted Women's Helpline, 24/7",
       pcSSL: "Seniors Safety Line, 24/7",
-      pcFoot: "All lines are free and confidential. More help: h3lp.francobernal.ca",
+      pcFoot: "All lines are free and confidential. More help: h3lp.ca",
       aboutTitle: "About h3lp",
       about: "h3lp is a free signpost for Ontario, made by Franco Bernal. We don’t run any of these services. We point you to trusted Ontario and Canada-wide organizations so you can reach real help directly. Every number was checked by hand; confirm local details by calling 211.",
       privacyTitle: "Privacy",
@@ -464,7 +464,7 @@
         del: "Supprimer mon plan", deleted: "Votre plan a été supprimé de cet appareil.",
         printFull: "Imprimer en pleine page", printWallet: "Imprimer en format portefeuille", saveImage: "Enregistrer en image",
         imageName: "mon-plan-de-securite.png",
-        printFoot: "En danger immédiat? Appelez le 911. Appelez ou textez le 988 à toute heure. h3lp.francobernal.ca"
+        printFoot: "En danger immédiat? Appelez le 911. Appelez ou textez le 988 à toute heure. h3lp.ca"
       },
       numbers: {
         lead: "Ajoutez ces lignes gratuites aux contacts de votre téléphone. Le fichier est créé sur cet appareil; rien n’est envoyé.",
@@ -480,7 +480,7 @@
       pcConnex: "ConnexOntario : dépendances et santé mentale, 24/7",
       pcAWHL: "Assaulted Women's Helpline (violence conjugale), 24/7",
       pcSSL: "Ligne d'assistance aux personnes âgées, 24/7",
-      pcFoot: "Toutes ces lignes sont gratuites et confidentielles. Plus d’aide : h3lp.francobernal.ca",
+      pcFoot: "Toutes ces lignes sont gratuites et confidentielles. Plus d’aide : h3lp.ca",
       aboutTitle: "À propos de h3lp",
       about: "h3lp est un point de repère gratuit pour l’Ontario, créé par Franco Bernal. Nous n’exploitons aucun de ces services. Nous vous dirigeons vers des organismes de confiance, ontariens et pancanadiens, pour que vous rejoigniez l’aide réelle directement. Chaque numéro a été vérifié à la main; confirmez les détails locaux en appelant le 211.",
       privacyTitle: "Confidentialité",
