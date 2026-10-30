@@ -2,8 +2,7 @@
 
 **A free, friendly hub that connects everyone in Ontario to real, verified help.**
 Someone to talk to, a meal today, a safe place, community, free youth sports, newcomer and
-legal support, and money basics. English and French. No sign-up. No tracking. Made by a
-civilian, for all civilians.
+legal support, and money basics. English and French. No sign-up. No tracking.
 
 Live site: https://h3lp.ca (also at https://h3lp.francobernal.ca)
 
@@ -36,7 +35,7 @@ one card with a `title`, `body` and `actions` (`tel:`, `sms:` or `https:`), plus
 block. Confirm any local detail by calling **211** before you rely on it.
 
 ## Working on it
-- `node --test tests/intent.test.js` runs the 241-phrase test of the search engine.
+- `node --test tests/intent.test.js` runs the 323-phrase test of the search engine.
 - `node tools/copy-doc.js` rebuilds `docs/COPY.md` (every string, EN and FR) from `data.js`.
 - `node tools/inline-sprite.js` copies `icons/sprite.svg` into `index.html`.
 - `bash scripts/build-public.sh` builds the allowlisted site into `_site/` (what Cloudflare
@@ -55,5 +54,4 @@ marks belong to their own organizations. The Fraunces and Atkinson Hyperlegible 
 ship under the SIL Open Font License (see `docs/licenses`). See the `LICENSE` file for the
 full terms.
 
-> "Reason remains bulletproof, even when written in code."
-> © 2026 Franco Bernal. Proudly built in Ontario, Canada.
+© 2026 Franco Bernal. Built in Ontario, Canada.
